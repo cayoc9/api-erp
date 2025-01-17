@@ -32,6 +32,9 @@ const options = {
 const specs = swaggerJsdoc(options);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
+// Error Handler
+const { errorHandler } = require('./utils/errorHandler');
+
 // Middlewares
 app.use(cors({
   origin: [
@@ -68,6 +71,9 @@ app.use('/api/indicators', indicatorRoutes);
 app.use('/api/hospitals', hospitalRoutes);
 app.use('/api/hospital-groups', hospitalGroupRoutes);
 
+
+// Global error handling middleware
+app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 /**

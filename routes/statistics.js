@@ -1,18 +1,39 @@
 const express = require('express');
 const router = express.Router();
-const StatisticsController = require('../controllers/StatisticsController');
-const statisticsValidation = require('../utils/statisticsValidation');
+const statisticsController = require('../controllers/StatisticsController');
+const statisticsValidation = require('../middleware/statisticsValidation');
 
-// Get aggregated statistics with filters
-router.get('/', statisticsValidation.validateFilters, StatisticsController.getStatistics);
+// Main statistics endpoint with query parameters:
+// - startDate: datetime (required)
+// - endDate: datetime (required)
+// - sectorId: integer (optional)  
+// - roleId: integer (optional)
+// - status: string (optional)
+router.get('/', 
+  statisticsValidation.validateDateRange,
+  statisticsValidation.validateFilters,
+  statisticsController.getStatistics
+);
 
-// Get statistics by sector
-router.get('/by-sector', statisticsValidation.validateFilters, StatisticsController.getBySector);
+// Resolution rates over time (line chart)
+router.get('/resolutions',
+  statisticsValidation.validateDateRange,
+  statisticsValidation.validateFilters,
+  statisticsController.getResolutionRates
+);
 
-// Get statistics by responsible/role
-router.get('/by-responsible', statisticsValidation.validateFilters, StatisticsController.getByResponsible);
+// Current status distribution (pie chart)
+router.get('/status',
+  statisticsValidation.validateDateRange,
+  statisticsValidation.validateFilters,
+  statisticsController.getStatusDistribution
+);
 
-// Get resolution rates
-router.get('/resolution-rates', statisticsValidation.validateFilters, StatisticsController.getResolutionRates);
+// Breakdowns for bar charts
+router.get('/breakdowns',
+  statisticsValidation.validateDateRange,
+  statisticsValidation.validateFilters,
+  statisticsController.getBreakdowns
+);
 
 module.exports = router;
