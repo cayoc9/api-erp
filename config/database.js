@@ -6,7 +6,7 @@ const config = require('./config'); // Certifique-se de que o caminho está corr
 // Adicionar log para debug
 console.log('\x1b[33m%s\x1b[0m', `[ENV Debug] NODE_ENV=${process.env.NODE_ENV}`);
 
-const env = 'production'; //ambiente forçado para produção (process.env.NODE_ENV ||)
+const env = process.env.NODE_ENV || 'development';  //ambiente forçado para produção ()
 
 console.log('\x1b[36m%s\x1b[0m', `[Database] Ambiente atual: ${env}`);
 

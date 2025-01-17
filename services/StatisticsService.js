@@ -1,32 +1,38 @@
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
+const sequelize = require('../config/database');
 const { Failure, TPInconsistency, Sector, Role } = require('../models');
 
 class StatisticsService {
   async getLineChartData(startDate, endDate, filters = {}) {
     const failures = await Failure.findAll({
       where: {
-        createdAt: { [Op.between]: [startDate, endDate] },
+        createDate: {
+          [Op.between]: [startDate, endDate]
+        },
         ...this._buildFilters(filters)
       },
       attributes: [
-        [sequelize.fn('date_trunc', 'month', sequelize.col('createdAt')), 'month'],
+        [sequelize.fn('date_trunc', 'month', sequelize.col('createDate')), 'month'],
         [sequelize.fn('COUNT', '*'), 'total'],
-        [sequelize.fn('COUNT', sequelize.literal("CASE WHEN status = 'RESOLVED' THEN 1 END")), 'resolved']
+        [sequelize.fn('COUNT',
+          sequelize.literal("CASE WHEN status = 'RESOLVED' THEN 1 END")),
+          'resolved'
+        ]
       ],
-      group: [sequelize.fn('date_trunc', 'month', sequelize.col('createdAt'))],
-      order: [[sequelize.fn('date_trunc', 'month', sequelize.col('createdAt')), 'ASC']]
+      group: [sequelize.fn('date_trunc', 'month', sequelize.col('createDate'))],
+      order: [[sequelize.fn('date_trunc', 'month', sequelize.col('createDate')), 'ASC']]
     });
 
     return failures.map(f => ({
-      month: f.dataValues.month,
-      resolvedRate: (f.dataValues.resolved / f.dataValues.total) * 100
+      month: f.get('month'),
+      resolvedRate: (f.get('resolved') / f.get('total')) * 100 || 0
     }));
   }
 
   async getPieChartData(startDate, endDate, filters = {}) {
     const counts = await Failure.findAll({
       where: {
-        createdAt: { [Op.between]: [startDate, endDate] },
+        createDate: { [Op.between]: [startDate, endDate] },
         ...this._buildFilters(filters)
       },
       attributes: [
@@ -62,26 +68,23 @@ class StatisticsService {
 
   async _getTypeDistribution(startDate, endDate, filters) {
     return await Failure.findAll({
-      include: [{
+      where: this._buildFilters({ startDate, endDate, ...filters }),
+      include: {
         model: TPInconsistency,
-        attributes: ['type'],
-        through: { attributes: [] }
-      }],
-      where: {
-        createdAt: { [Op.between]: [startDate, endDate] },
-        ...this._buildFilters(filters)
+        through: { attributes: [] }, // Remove atributos da tabela de junção
+        attributes: ['description'],
       },
       attributes: [
-        [sequelize.fn('COUNT', '*'), 'count']
+        [sequelize.fn('COUNT', sequelize.col('*')), 'count']
       ],
-      group: ['TPInconsistency.type']
+      group: ['TPInconsistencies.description']
     });
   }
 
   async _getFormDistribution(startDate, endDate, filters) {
     return await Failure.findAll({
       where: {
-        createdAt: { [Op.between]: [startDate, endDate] },
+        createDate: { [Op.between]: [startDate, endDate] },
         ...this._buildFilters(filters)
       },
       attributes: [
@@ -100,7 +103,7 @@ class StatisticsService {
         attributes: ['name']
       }],
       where: {
-        createdAt: { [Op.between]: [startDate, endDate] },
+        createDate: { [Op.between]: [startDate, endDate] },
         ...this._buildFilters(filters)
       },
       attributes: [
@@ -147,19 +150,19 @@ class StatisticsService {
 
   _buildFilters(filters) {
     const where = {};
-    
+
     if (filters.sectorId) {
       where.sectorReporterId = filters.sectorId;
     }
-    
+
     if (filters.roleId) {
       where.roleId = filters.roleId;
     }
-    
+
     if (filters.status) {
       where.status = filters.status;
     }
-    
+
     return where;
   }
 }

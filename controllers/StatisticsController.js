@@ -4,20 +4,31 @@ const ChartFormatter = require('../utils/chartFormatter');
 
 // Estatísticas gerais
 exports.getStatistics = async (req, res) => {
-    const { startDate, endDate, ...filters } = req.validatedParams;
-
     try {
+        // Padroniza os parâmetros de data
+        const startDate = req.query.dateRange?.start || req.query.startDate;
+        const endDate = req.query.dateRange?.end || req.query.endDate;
+
+        // Validação das datas
+        if (!startDate || !endDate) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Datas inicial e final são obrigatórias'
+            });
+        }
+
         const data = {
-            lineChart: await StatisticsService.getLineChartData(startDate, endDate, filters),
-            pieChart: await StatisticsService.getPieChartData(startDate, endDate, filters),
-            barCharts: await StatisticsService.getBarChartData(startDate, endDate, filters)
+            lineChart: await StatisticsService.getLineChartData(startDate, endDate, req.validatedParams),
+            pieChart: await StatisticsService.getPieChartData(startDate, endDate, req.validatedParams),
+            barCharts: await StatisticsService.getBarChartData(startDate, endDate, req.validatedParams)
         };
 
         res.json(ChartFormatter.formatResponse(data));
     } catch (error) {
+        console.error('Erro ao buscar estatísticas:', error);
         res.status(500).json({
-            message: 'Erro ao obter estatísticas',
-            error: error.message
+            status: 'error',
+            message: 'Erro ao processar estatísticas'
         });
     }
 };

@@ -40,7 +40,7 @@ const { errorHandler } = require('./utils/errorHandler');
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    'http://10.100.59.94:5173', 
+    'http://10.100.59.94:5173',
     'https://plataformas.icsf.com.br',
     'http://plataformas.icsf.com.br'
   ],
@@ -71,7 +71,7 @@ app.use('/api/failures', failureRoutes);
 app.use('/api/indicators', indicatorRoutes);
 app.use('/api/hospitals', hospitalRoutes);
 app.use('/api/hospital-groups', hospitalGroupRoutes);
-app.use('/api/statistics', statisticsRoutes); // Falta adicionar no app.js
+app.use('/api/statistics', statisticsRoutes);
 
 // Global error handling middleware
 app.use(errorHandler);
