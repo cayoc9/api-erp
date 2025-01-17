@@ -15,6 +15,7 @@ const hospitalRoutes = require('./routes/hospitals');
 const formRoutes = require('./routes/forms'); // Rota de forms
 const tpInconsistenciesRoutes = require('./routes/tp-inconsistencies');
 const hospitalGroupRoutes = require('./routes/hospital-groups'); // Rota de hospital-groups
+const statisticsRoutes = require('./routes/statistics'); // Rota de statistics
 
 const app = express();
 
@@ -70,7 +71,7 @@ app.use('/api/failures', failureRoutes);
 app.use('/api/indicators', indicatorRoutes);
 app.use('/api/hospitals', hospitalRoutes);
 app.use('/api/hospital-groups', hospitalGroupRoutes);
-
+app.use('/api/statistics', statisticsRoutes); // Falta adicionar no app.js
 
 // Global error handling middleware
 app.use(errorHandler);
