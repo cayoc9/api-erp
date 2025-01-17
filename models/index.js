@@ -51,14 +51,14 @@ TPInconsistencies.belongsToMany(Failure, {
 });
 
 // Adicionar/verificar relacionamento
-Hospital.hasMany(Failure, { 
-  foreignKey: 'hospitalId', 
-  as: 'failures' 
+Hospital.hasMany(Failure, {
+  foreignKey: 'hospitalId',
+  as: 'failures'
 });
 
-Failure.belongsTo(Hospital, { 
-  foreignKey: 'hospitalId', 
-  as: 'hospital' 
+Failure.belongsTo(Hospital, {
+  foreignKey: 'hospitalId',
+  as: 'hospital'
 });
 
 // Exportação dos modelos e da instância do Sequelize

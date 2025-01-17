@@ -1,7 +1,14 @@
 // config/database.js
+require('dotenv').config();
 const { Sequelize } = require('sequelize');
 const config = require('./config'); // Certifique-se de que o caminho está correto
-const env = process.env.NODE_ENV || 'development';
+
+// Adicionar log para debug
+console.log('\x1b[33m%s\x1b[0m', `[ENV Debug] NODE_ENV=${process.env.NODE_ENV}`);
+
+const env = 'production'; //ambiente forçado para produção (process.env.NODE_ENV ||)
+
+console.log('\x1b[36m%s\x1b[0m', `[Database] Ambiente atual: ${env}`);
 
 const sequelize = new Sequelize(
   config[env].database,

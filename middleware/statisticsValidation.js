@@ -1,6 +1,21 @@
 // middleware/statisticsValidation.js
 
-const { sanitizeQuery } = require('express-validator/filter');
+const { query } = require('express-validator');
+
+const validateDateRange = (req, res, next) => {
+  const { startDate, endDate } = req.query;
+  
+  if (!startDate || !endDate) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Validation failed',
+      errors: ['Both startDate and endDate are required'],
+      code: 400
+    });
+  }
+  
+  next();
+};
 
 /**
  * Validates and sanitizes query parameters for statistics endpoints
@@ -87,5 +102,6 @@ const validateFilters = (req, res, next) => {
 };
 
 module.exports = {
-  validateFilters
+  validateFilters,
+  validateDateRange  // Adicione esta exportação
 };
