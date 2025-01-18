@@ -2,7 +2,7 @@
 
 const { Op, Sequelize } = require('sequelize');
 const sequelize = require('../config/database');
-const { Failure, TPInconsistencies, Sector, Responsible } = require('../models');
+const { Failure, TPInconsistencies, Sector, Responsible, Form } = require('../models'); // Adicionando Form
 
 class StatisticsService {
   async getLineChartData(startDate, endDate, filters = {}) {
@@ -28,10 +28,7 @@ class StatisticsService {
 
   async getPieChartData(startDate, endDate, filters = {}) {
     const counts = await Failure.findAll({
-      where: {
-        createDate: { [Op.between]: [startDate, endDate] },
-        ...this._buildFilters(filters)
-      },
+      ...this._getBaseQueryConfig(startDate, endDate, filters),
       attributes: [
         ['status', 'status'],
         [sequelize.fn('COUNT', '*'), 'count']
@@ -64,62 +61,59 @@ class StatisticsService {
   }
 
   async _getTypeDistribution(startDate, endDate, filters) {
-    try {
-      const result = await Failure.findAll({
-        attributes: [
-          [sequelize.fn('COUNT', '*'), 'count'],
-          [sequelize.col('tpInconsistencies.description'), 'description']
-        ],
-        include: [{
-          model: TPInconsistencies,
-          as: 'tpInconsistencies',
-          attributes: [],
-          through: { attributes: [] } // Remove atributos da tabela de junção
-        }],
-        where: {
-          create_date: { [Op.between]: [startDate, endDate] },
-          ...this._buildFilters(filters)
-        },
-        group: ['tpInconsistencies.description'], // Simplifica o agrupamento
-        raw: true // Retorna objetos planos
-      });
-
-      return result;
-    } catch (error) {
-      console.error('Erro ao buscar distribuição por tipo:', error);
-      throw error;
-    }
+    return await Failure.findAll({
+      ...this._getBaseQueryConfig(startDate, endDate, filters),
+      attributes: [
+        [sequelize.col('tpInconsistencies.description'), 'description'],
+        [sequelize.fn('COUNT', '*'), 'count']
+      ],
+      include: [{
+        model: TPInconsistencies,
+        as: 'tpInconsistencies',
+        attributes: [],
+        through: { attributes: [] }
+      }],
+      group: ['tpInconsistencies.description']
+    });
   }
 
   async _getFormDistribution(startDate, endDate, filters) {
     return await Failure.findAll({
-      where: {
-        createDate: { [Op.between]: [startDate, endDate] },
-        ...this._buildFilters(filters)
-      },
       attributes: [
-        'formType',
+        [sequelize.col('formulario.description'), 'formType'],
         [sequelize.fn('COUNT', '*'), 'count']
       ],
-      group: ['formType']
+      include: [{
+        model: Form,
+        as: 'formulario',
+        attributes: []
+      }],
+      where: {
+        create_date: { [Op.between]: [startDate, endDate] },
+        ...this._buildFilters(filters)
+      },
+      group: ['formulario.description'],
+      raw: true
     });
   }
 
   async _getSectorDistribution(startDate, endDate, filters) {
     return await Failure.findAll({
+      attributes: [
+        [sequelize.col('sectorReporter.name'), 'name'],
+        [sequelize.fn('COUNT', '*'), 'count']
+      ],
       include: [{
         model: Sector,
         as: 'sectorReporter',
-        attributes: ['name']
+        attributes: []
       }],
       where: {
-        createDate: { [Op.between]: [startDate, endDate] },
+        create_date: { [Op.between]: [startDate, endDate] },
         ...this._buildFilters(filters)
       },
-      attributes: [
-        [sequelize.fn('COUNT', '*'), 'count']
-      ],
-      group: ['sectorReporter.name']
+      group: ['sectorReporter.name', 'sectorReporter.id'],
+      raw: true
     });
   }
 
@@ -131,34 +125,43 @@ class StatisticsService {
         attributes: ['role']
       }],
       where: {
-        createDate: { [Op.between]: [startDate, endDate] },
+        create_date: { [Op.between]: [startDate, endDate] },
         ...this._buildFilters(filters)
       },
       attributes: [
         [sequelize.fn('COUNT', '*'), 'count'],
         [sequelize.col('responsible.role'), 'role']
       ],
-      group: ['responsible.role']
+      group: ['responsible.role', 'responsible.id'],
+      raw: true
     });
   }
 
   async _getRoleDistribution(startDate, endDate, filters) {
     return await Failure.findAll({
+      ...this._getBaseQueryConfig(startDate, endDate, filters),
+      attributes: [
+        [sequelize.col('responsible.role'), 'role'],
+        [sequelize.fn('COUNT', '*'), 'count']
+      ],
       include: [{
         model: Responsible,
         as: 'responsible',
-        attributes: ['role']
+        attributes: []
       }],
+      group: ['responsible.role', 'responsible.id']
+    });
+  }
+
+
+  _getBaseQueryConfig(startDate, endDate, filters) {
+    return {
       where: {
-        createDate: { [Op.between]: [startDate, endDate] },
+        create_date: { [Op.between]: [startDate, endDate] },
         ...this._buildFilters(filters)
       },
-      attributes: [
-        [sequelize.fn('COUNT', '*'), 'count'],
-        [sequelize.col('responsible.role'), 'role']
-      ],
-      group: ['responsible.role']
-    });
+      raw: true
+    };
   }
 
   _buildFilters(filters) {

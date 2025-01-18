@@ -97,4 +97,12 @@ const Failure = sequelize.define('Failure', failureSchema, {
   freezeTableName: true
 });
 
+Failure.associate = (models) => {
+  Failure.belongsTo(models.Responsible, {
+    foreignKey: 'professionalId',
+    as: 'responsible'
+  });
+  // ...outras associações existentes
+};
+
 module.exports = Failure;

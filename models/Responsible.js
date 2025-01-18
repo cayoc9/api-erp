@@ -34,7 +34,14 @@ const responsibleSchema = {
   }
 }
 
-class Responsible extends Model { }
+class Responsible extends Model {
+  static associate(models) {
+    Responsible.hasMany(models.Failure, {
+      foreignKey: 'professionalId',
+      as: 'failures'
+    });
+  }
+}
 
 Responsible.init(responsibleSchema, {
   sequelize,
