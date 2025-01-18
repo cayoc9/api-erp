@@ -103,6 +103,33 @@ exports.createFailure = async (req, res) => {
       createUser
     } = req.body;
 
+    // Adicionar log para debug
+    console.log('Dados recebidos:', {
+      prontuarioCode,
+      formularioId,
+      formularioDate,
+      professionalId,
+      hospitalId,
+      sectorId,
+      tpInconsistenciaIds,
+      createUser
+    });
+
+    // Verificar se o hospital existe
+    const hospital = await Hospital.findByPk(hospitalId);
+    console.log('Hospital encontrado:', hospital); // Log adicional
+
+    if (!hospital) {
+      return res.status(400).json({
+        status: 'error',
+        message: `Hospital com ID ${hospitalId} não encontrado`,
+        debug: { 
+          receivedId: hospitalId,
+          type: typeof hospitalId
+        }
+      });
+    }
+
     // Criar a falha com status padrão
     const newFailure = await Failure.create({
       prontuarioCode,
@@ -114,7 +141,9 @@ exports.createFailure = async (req, res) => {
       observacoes,
       createUser,
       status: 'Pending', // Adicionando status padrão
-      createDate: new Date() // Adicionando data de criação
+      createDate: new Date(), // Adicionando data de criação
+      sectorResponsibleId: sectorId, // Usar o setor recebido
+      sectorReporterId: 10 // ALA B por padrão (comente para editar esse trecho quando tivermos tabelas user)
     }, { transaction });
 
     // Associar as inconsistências

@@ -85,7 +85,7 @@ const PORT = process.env.PORT || 5000;
 sequelize.authenticate()
   .then(() => {
     console.log('Connected to the database...');
-    return sequelize.sync({ force: false });  // Mude para true apenas se necessário
+    return sequelize.sync({ alter: false }); // Em desenvolvimento apenas
   })
   .then(() => {
     console.log('Models synchronized with the database.');

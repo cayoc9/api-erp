@@ -9,11 +9,12 @@ const Sector = sequelize.define('Sector', {
     autoIncrement: true, // Se `CD_SETOR` é auto-increment
   },
   name: { // DS_SETOR
-    type: DataTypes.STRING(20),
+    type: DataTypes.STRING(100),
     allowNull: false,
   },
   hospitalId: { // CD_HOSPITAL
     type: DataTypes.INTEGER, // Ajustado para INTEGER
+    field: 'hospital_id', // Nome exato da coluna no banco
     allowNull: false,
     references: {
       model: 'hospitals',
@@ -22,6 +23,7 @@ const Sector = sequelize.define('Sector', {
   },
   createDate: { // CREATE_DATE
     type: DataTypes.DATE,
+    field: 'create_date',
     allowNull: true,
     defaultValue: DataTypes.NOW,
   },
@@ -40,6 +42,7 @@ const Sector = sequelize.define('Sector', {
 }, {
   tableName: 'sectors',
   timestamps: false,
+  underscored: true,
 });
 
 module.exports = Sector;

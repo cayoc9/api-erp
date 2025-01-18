@@ -75,7 +75,8 @@ const failureSchema = {
     references: {
       model: 'sectors',
       key: 'id'
-    }
+    },
+    defaultValue: 10 // ALA B por padrão (trocar setor do user quando user for criado)
   },
   sectorResponsibleId: {
     type: DataTypes.INTEGER,

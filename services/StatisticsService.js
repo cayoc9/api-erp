@@ -8,21 +8,21 @@ class StatisticsService {
   async getLineChartData(startDate, endDate, filters = {}) {
     const failures = await Failure.findAll({
       where: {
-        createDate: {
+        create_date: { // Alterado de createDate para create_date
           [Op.between]: [startDate, endDate]
         },
         ...this._buildFilters(filters)
       },
       attributes: [
-        [sequelize.fn('date_trunc', 'month', sequelize.col('createDate')), 'month'],
+        [sequelize.fn('date_trunc', 'month', sequelize.col('create_date')), 'month'], // Alterado aqui também
         [sequelize.fn('COUNT', '*'), 'total'],
         [sequelize.fn('COUNT',
           sequelize.literal("CASE WHEN status = 'RESOLVED' THEN 1 END")),
           'resolved'
         ]
       ],
-      group: [sequelize.fn('date_trunc', 'month', sequelize.col('createDate'))],
-      order: [[sequelize.fn('date_trunc', 'month', sequelize.col('createDate')), 'ASC']]
+      group: [sequelize.fn('date_trunc', 'month', sequelize.col('create_date'))], // E aqui
+      order: [[sequelize.fn('date_trunc', 'month', sequelize.col('create_date')), 'ASC']] // E aqui
     });
 
     return failures.map(f => ({

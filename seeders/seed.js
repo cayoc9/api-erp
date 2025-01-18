@@ -327,240 +327,240 @@ async function seed() {
     ], { returning: true, transaction });
 
 
-    // // 8. Insere TPInconsistencies
-    // const tpInconsistencies = await TPInconsistencies.bulkCreate([
-    //   {
-    //     description: 'Checagem irregular',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Embalagem de OPME ausente',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Formulário ausente',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Formulário incompleto (etiquetas de rastreabilidade de OPME)',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Formulário incompleto (indicadores de esterilização)',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Formulário sem assinatura do paciente/responsável',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Formulário sem registro',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Formulário/Registro sem data',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Procedimento incompatível',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Registro ausente',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Registro em formulário incorreto',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Registro em formulário não padronizado institucionalmente',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Registro ilegível',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Registro incompleto',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Registro incorreto',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Registro rasurado',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Registro sem assinatura do profissional',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Registro sem assinatura e sem identificação do profissional',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Registro sem identificação do profissional',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Documento de imagem ausente',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Documento(s) entregue com atraso no Faturamento/Produção',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Registro sem assinatura do responsável/acompanhante',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Conta fora do prazo de apresentação',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Extravio de Prontuário',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Faturamento inválido por falta de habilitação/serviço e classificação',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Formulário danificado',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Internação não cadastrada no Sistema de Regulação',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'OPME não compatível com o Procedimento Principal',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'OPME utilizado em quantidade excedente',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Paciente atendido sem cadastro no ERP (sistema hospitalar)',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Paciente com alta no ERP (sistema hospitalar), sem a correspondente baixa no Sistema de Regulação',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Procedimento realizado não consta na Tabela SUS',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Prontuário incompleto',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Profissional de saúde não cadastrado ou com erro de cadastro no SCNES',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Prontuário com documento(s) de outro(s) paciente(s)',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Prontuário fora da ordem padronizada institucionalmente',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Internação sem número de AIH atribuído',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'CID ausente',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'CID incoerente com o tratamento realizado',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Nota Fiscal sem código de barras - Controle INTERNO OPME',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Cadastro do paciente em duplicidade no ERP (sistema hospitalar)',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Falta registro de alta hospitalar',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Falta registro de alta hospitalar - RN não internado',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Falta registro do TIPO de alta',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Codificação de OPME com inconsistência',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   },
-    //   {
-    //     description: 'Nota Fiscal - Ocorrências diversas',
-    //     status: true,
-    //     createDate: new Date('2025-01-05 17:19:26.17215+00')
-    //   }
-    // ], { returning: true, transaction });
-    // console.log('Dados inseridos em TPInconsistencies.');
+    // 8. Insere TPInconsistencies
+    const tpInconsistencies = await TPInconsistencies.bulkCreate([
+      {
+        description: 'Checagem irregular',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Embalagem de OPME ausente',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Formulário ausente',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Formulário incompleto (etiquetas de rastreabilidade de OPME)',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Formulário incompleto (indicadores de esterilização)',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Formulário sem assinatura do paciente/responsável',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Formulário sem registro',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Formulário/Registro sem data',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Procedimento incompatível',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Registro ausente',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Registro em formulário incorreto',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Registro em formulário não padronizado institucionalmente',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Registro ilegível',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Registro incompleto',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Registro incorreto',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Registro rasurado',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Registro sem assinatura do profissional',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Registro sem assinatura e sem identificação do profissional',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Registro sem identificação do profissional',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Documento de imagem ausente',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Documento(s) entregue com atraso no Faturamento/Produção',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Registro sem assinatura do responsável/acompanhante',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Conta fora do prazo de apresentação',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Extravio de Prontuário',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Faturamento inválido por falta de habilitação/serviço e classificação',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Formulário danificado',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Internação não cadastrada no Sistema de Regulação',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'OPME não compatível com o Procedimento Principal',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'OPME utilizado em quantidade excedente',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Paciente atendido sem cadastro no ERP (sistema hospitalar)',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Paciente com alta no ERP (sistema hospitalar), sem a correspondente baixa no Sistema de Regulação',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Procedimento realizado não consta na Tabela SUS',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Prontuário incompleto',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Profissional de saúde não cadastrado ou com erro de cadastro no SCNES',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Prontuário com documento(s) de outro(s) paciente(s)',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Prontuário fora da ordem padronizada institucionalmente',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Internação sem número de AIH atribuído',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'CID ausente',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'CID incoerente com o tratamento realizado',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Nota Fiscal sem código de barras - Controle INTERNO OPME',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Cadastro do paciente em duplicidade no ERP (sistema hospitalar)',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Falta registro de alta hospitalar',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Falta registro de alta hospitalar - RN não internado',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Falta registro do TIPO de alta',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Codificação de OPME com inconsistência',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      },
+      {
+        description: 'Nota Fiscal - Ocorrências diversas',
+        status: true,
+        createDate: new Date('2025-01-05 17:19:26.17215+00')
+      }
+    ], { returning: true, transaction });
+    console.log('Dados inseridos em TPInconsistencies.');
 
 
     // 9. Insere Indicators
