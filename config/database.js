@@ -19,6 +19,13 @@ const sequelize = new Sequelize(
     dialect: config[env].dialect,
     port: config[env].port,
     logging: false, // POder Desabilitar logs SQL se desejado
+    define: {
+      underscored: true,
+      freezeTableName: true,
+      timestamps: true,
+      createdAt: 'createDate',
+      updatedAt: 'updateDate'
+    }
   }
 );
 

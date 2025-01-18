@@ -50,6 +50,17 @@ TPInconsistencies.belongsToMany(Failure, {
   as: 'failures',
 });
 
+// Associações para sectorReporter e sectorResponsible
+Failure.belongsTo(Sector, {
+  foreignKey: 'sectorReporterId',
+  as: 'sectorReporter'
+});
+
+Failure.belongsTo(Sector, {
+  foreignKey: 'sectorResponsibleId',
+  as: 'sectorResponsible'
+});
+
 // Adicionar/verificar relacionamento
 Hospital.hasMany(Failure, {
   foreignKey: 'hospitalId',

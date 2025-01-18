@@ -1,6 +1,8 @@
+//StatisticsService.js
+
 const { Op, Sequelize } = require('sequelize');
 const sequelize = require('../config/database');
-const { Failure, TPInconsistency, Sector, Role } = require('../models');
+const { Failure, TPInconsistencies, Sector, Role } = require('../models');
 
 class StatisticsService {
   async getLineChartData(startDate, endDate, filters = {}) {
@@ -70,7 +72,7 @@ class StatisticsService {
     return await Failure.findAll({
       where: this._buildFilters({ startDate, endDate, ...filters }),
       include: {
-        model: TPInconsistency,
+        model: TPInconsistencies,
         through: { attributes: [] }, // Remove atributos da tabela de junção
         attributes: ['description'],
       },

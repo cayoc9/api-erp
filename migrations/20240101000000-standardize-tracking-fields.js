@@ -8,22 +8,33 @@ module.exports = {
     ];
 
     for (const table of tables) {
-      // Renomear createdAt para createDate
-      await queryInterface.renameColumn(table, 'createdAt', 'createDate');
+      // Verificar estrutura da tabela
+      const tableInfo = await queryInterface.describeTable(table);
       
-      // Renomear updatedAt para updateDate  
-      await queryInterface.renameColumn(table, 'updatedAt', 'updateDate');
+      // Renomear apenas se existir createdAt e não existir createDate
+      if (tableInfo.createdAt && !tableInfo.createDate) {
+        await queryInterface.renameColumn(table, 'createdAt', 'createDate');
+      }
       
-      // Adicionar campos de usuário
-      await queryInterface.addColumn(table, 'createUser', {
-        type: Sequelize.INTEGER,
-        allowNull: true
-      });
+      // Renomear apenas se existir updatedAt e não existir updateDate
+      if (tableInfo.updatedAt && !tableInfo.updateDate) {
+        await queryInterface.renameColumn(table, 'updatedAt', 'updateDate');
+      }
       
-      await queryInterface.addColumn(table, 'updateUser', {
-        type: Sequelize.INTEGER,
-        allowNull: true
-      });
+      // Adicionar campos de usuário se não existirem
+      if (!tableInfo.createUser) {
+        await queryInterface.addColumn(table, 'createUser', {
+          type: Sequelize.INTEGER,
+          allowNull: true
+        });
+      }
+      
+      if (!tableInfo.updateUser) {
+        await queryInterface.addColumn(table, 'updateUser', {
+          type: Sequelize.INTEGER,
+          allowNull: true
+        });
+      }
     }
   },
 
@@ -34,10 +45,23 @@ module.exports = {
     ];
 
     for (const table of tables) {
-      await queryInterface.renameColumn(table, 'createDate', 'createdAt');
-      await queryInterface.renameColumn(table, 'updateDate', 'updatedAt');
-      await queryInterface.removeColumn(table, 'createUser');
-      await queryInterface.removeColumn(table, 'updateUser');
+      const tableInfo = await queryInterface.describeTable(table);
+      
+      if (tableInfo.createDate) {
+        await queryInterface.renameColumn(table, 'createDate', 'createdAt');
+      }
+      
+      if (tableInfo.updateDate) {
+        await queryInterface.renameColumn(table, 'updateDate', 'updatedAt');
+      }
+      
+      if (tableInfo.createUser) {
+        await queryInterface.removeColumn(table, 'createUser');
+      }
+      
+      if (tableInfo.updateUser) {
+        await queryInterface.removeColumn(table, 'updateUser');
+      }
     }
   }
 };

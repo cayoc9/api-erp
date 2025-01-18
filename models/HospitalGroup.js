@@ -30,7 +30,7 @@ const HospitalGroup = sequelize.define('HospitalGroup', {
     allowNull: true,
   },
 }, {
-  tableName: 'grupos_hospitais', // Nome em português, conforme tabela existente
+  tableName: 'hospital_groups',
   timestamps: false,
 });
 

@@ -11,6 +11,11 @@ const responsibleSchema = {
     type: DataTypes.STRING(30),
     allowNull: false
   },
+  role: {
+    type: DataTypes.STRING(50),
+    allowNull: false,
+    defaultValue: 'Interno'
+  },
   createDate: {
     type: DataTypes.DATE,
     allowNull: true
@@ -29,13 +34,14 @@ const responsibleSchema = {
   }
 }
 
-class Responsible extends Model {}
+class Responsible extends Model { }
 
 Responsible.init(responsibleSchema, {
   sequelize,
   modelName: 'Responsible',
   tableName: 'responsibles',
   timestamps: false,
+  underscored: true,
 });
 
 module.exports = Responsible;

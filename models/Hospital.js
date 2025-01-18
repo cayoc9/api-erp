@@ -16,7 +16,7 @@ const Hospital = sequelize.define('Hospital', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'grupos_hospitais',
+      model: 'hospital_groups',
       key: 'id',
     },
   },

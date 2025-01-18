@@ -39,7 +39,11 @@ const tpInconsistenciesSchema = {
 
 const TPInconsistencies = sequelize.define('TPInconsistencies', tpInconsistenciesSchema, {
   tableName: 'tp_inconsistencies',
-  timestamps: false, // Caso não use createdAt/updatedAt automáticos
+  timestamps: true,
+  createdAt: 'createDate',
+  updatedAt: 'updateDate',
+  underscored: true,
+  freezeTableName: true
 });
 
 module.exports = TPInconsistencies;

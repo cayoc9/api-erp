@@ -19,7 +19,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'HospitalGroups',
+          model: 'hospital_groups',
           key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -28,22 +28,7 @@ module.exports = {
       createUser: {
         type: Sequelize.INTEGER,
         allowNull: true,
-        references: {
-          model: 'Users', // Substitua por sua tabela de usuários, se aplicável
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL'
-      },
-      updateUser: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-        references: {
-          model: 'Users', // Substitua por sua tabela de usuários, se aplicável
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL'
+        defaultValue: 1 // Valor padrão 1 - Alterar quando implementar tabela de usuários
       },
       createdAt: {
         allowNull: false,
