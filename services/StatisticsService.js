@@ -11,18 +11,26 @@ class StatisticsService {
         create_date: { [Op.between]: [startDate, endDate] },
         ...this._buildFilters(filters)
       },
+      include: [{
+        model: TPInconsistencies,
+        as: 'tpInconsistencies',
+        through: { attributes: [] }
+      }],
       attributes: [
-        [sequelize.fn('date_trunc', 'month', sequelize.col('create_date')), 'month'],
+        // Especificar explicitamente a tabela para create_date
+        [sequelize.fn('date_trunc', 'month', sequelize.col('Failure.create_date')), 'month'],
         [sequelize.fn('COUNT', '*'), 'total'],
         [sequelize.fn('COUNT', sequelize.literal("CASE WHEN status = 'RESOLVED' THEN 1 END")), 'resolved']
       ],
-      group: [sequelize.fn('date_trunc', 'month', sequelize.col('create_date'))],
-      order: [[sequelize.fn('date_trunc', 'month', sequelize.col('create_date')), 'ASC']]
+      group: [sequelize.fn('date_trunc', 'month', sequelize.col('Failure.create_date'))],
+      order: [[sequelize.fn('date_trunc', 'month', sequelize.col('Failure.create_date')), 'ASC']]
     });
 
     return failures.map(f => ({
       month: f.get('month'),
-      resolvedRate: (f.get('resolved') / f.get('total')) * 100 || 0
+      resolvedRate: f.get('total') > 0 
+        ? parseFloat(((f.get('resolved') / f.get('total')) * 100).toFixed(2))
+        : 0
     }));
   }
 
@@ -62,7 +70,10 @@ class StatisticsService {
 
   async _getTypeDistribution(startDate, endDate, filters) {
     return await Failure.findAll({
-      ...this._getBaseQueryConfig(startDate, endDate, filters),
+      where: {
+        create_date: { [Op.between]: [startDate, endDate] },
+        ...this._buildFilters(filters)
+      },
       attributes: [
         [sequelize.col('tpInconsistencies.description'), 'description'],
         [sequelize.fn('COUNT', '*'), 'count']
@@ -73,7 +84,8 @@ class StatisticsService {
         attributes: [],
         through: { attributes: [] }
       }],
-      group: ['tpInconsistencies.description']
+      group: ['tpInconsistencies.description'],
+      raw: true
     });
   }
 
@@ -171,12 +183,28 @@ class StatisticsService {
       where.sector_id = filters.sectorId;
     }
 
+    if (filters.sectorId) {
+      where.sector_id = filters.sectorId;
+    }
+
+    if (filters.sectorId) {
+      where.sector_id = filters.sectorId;
+    }
+
+    if (filters.sectorId) {
+      where.sector_id = filters.sectorId;
+    }
+
     if (filters.roleId) {
       where.professional_id = filters.roleId;
     }
 
     if (filters.status) {
       where.status = filters.status;
+    }
+
+    if (filters.tpInconsistencyIds) {
+      where['$tpInconsistencies.id$'] = { [Op.in]: filters.tpInconsistencyIds };
     }
 
     return where;

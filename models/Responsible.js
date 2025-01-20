@@ -48,7 +48,7 @@ Responsible.init(responsibleSchema, {
   modelName: 'Responsible',
   tableName: 'responsibles',
   timestamps: false,
-  underscored: true,
+  underscored: true
 });
 
 module.exports = Responsible;
