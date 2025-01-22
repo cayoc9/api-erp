@@ -1,4 +1,4 @@
-const { validateFilters } = require('../../middleware/statisticsValidation');
+const { validateFilters } = require('../../middlewares/statisticsValidation');
 
 describe('Statistics Validation Middleware', () => {
     let req, res, next;

@@ -1,38 +1,29 @@
 const express = require('express');
 const router = express.Router();
 const statisticsController = require('../controllers/StatisticsController');
-const statisticsValidation = require('../middleware/statisticsValidation');
+const { validateStatisticsParams } = require('../middlewares/validations/statisticsValidation');
 
-// Main statistics endpoint with query parameters:
-// - startDate: datetime (required)
-// - endDate: datetime (required)
-// - sectorId: integer (optional)  
-// - roleId: integer (optional)
-// - status: string (optional)
-router.get('/', 
-  statisticsValidation.validateDateRange,
-  statisticsValidation.validateFilters,
+// Main statistics endpoint
+router.get('/',
+  validateStatisticsParams,
   statisticsController.getStatistics
 );
 
-// Resolution rates over time (line chart)
+// Resolution rates over time
 router.get('/resolutions',
-  statisticsValidation.validateDateRange,
-  statisticsValidation.validateFilters,
+  validateStatisticsParams,
   statisticsController.getResolutionRates
 );
 
-// Current status distribution (pie chart)
+// Current status distribution
 router.get('/status',
-  statisticsValidation.validateDateRange,
-  statisticsValidation.validateFilters,
+  validateStatisticsParams,
   statisticsController.getStatusDistribution
 );
 
 // Breakdowns for bar charts
 router.get('/breakdowns',
-  statisticsValidation.validateDateRange,
-  statisticsValidation.validateFilters,
+  validateStatisticsParams,
   statisticsController.getBreakdowns
 );
 

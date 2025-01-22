@@ -17,6 +17,11 @@ const tpInconsistenciesRoutes = require('./routes/tp-inconsistencies');
 const hospitalGroupRoutes = require('./routes/hospital-groups'); // Rota de hospital-groups
 const statisticsRoutes = require('./routes/statistics'); // Rota de statistics
 
+// Importar middlewares
+const authMiddleware = require('./middlewares/auth');
+const requestLogger = require('./middlewares/requestLogger');
+const rateLimiter = require('./middlewares/rateLimiter');
+
 const app = express();
 
 const options = {
@@ -61,6 +66,16 @@ app.use('/api/forms/with-failures', (req, res, next) => {
   }
   next();
 });
+
+// Aplicar middlewares globais
+app.use(requestLogger);
+app.use(rateLimiter);
+
+// Rotas públicas
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+// Middleware de autenticação para rotas protegidas
+app.use('/api', authMiddleware);
 
 // Rotas
 app.use('/api/responsibles', responsibleRoutes);
