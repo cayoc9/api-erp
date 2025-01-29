@@ -18,8 +18,8 @@ describe('Failure Routes', () => {
   describe('GET /', () => {
     it('deve retornar lista de falhas', async () => {
       const mockFailures = [
-        { id: 1, description: 'Falha 1' },
-        { id: 2, description: 'Falha 2' }
+        { id: 1, description: 'Falha 1', inconsistencyTypeId: 1, formId: 1 },
+        { id: 2, description: 'Falha 2', inconsistencyTypeId: 1, formId: 1 }
       ];
 
       failureController.getAllFailures.mockImplementation((req, res) => {
@@ -37,7 +37,7 @@ describe('Failure Routes', () => {
 
   describe('GET /:id', () => {
     it('deve retornar uma falha específica', async () => {
-      const mockFailure = { id: 1, description: 'Falha 1' };
+      const mockFailure = { id: 1, description: 'Falha 1', inconsistencyTypeId: 1, formId: 1 };
 
       failureController.getFailureById.mockImplementation((req, res) => {
         res.json(mockFailure);
@@ -54,7 +54,11 @@ describe('Failure Routes', () => {
 
   describe('POST /', () => {
     it('deve criar uma nova falha', async () => {
-      const newFailure = { description: 'Nova Falha' };
+      const newFailure = {
+        description: 'Nova Falha',
+        inconsistencyTypeId: 1,
+        formId: 1
+      };
       const createdFailure = { id: 1, ...newFailure };
 
       failureController.createFailure.mockImplementation((req, res) => {
@@ -73,7 +77,7 @@ describe('Failure Routes', () => {
 
   describe('PUT /:id', () => {
     it('deve atualizar uma falha existente', async () => {
-      const updatedFailure = { id: 1, description: 'Falha Atualizada' };
+      const updatedFailure = { id: 1, description: 'Falha Atualizada', inconsistencyTypeId: 1, formId: 1 };
 
       failureController.updateFailure.mockImplementation((req, res) => {
         res.json(updatedFailure);

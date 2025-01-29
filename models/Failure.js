@@ -137,6 +137,15 @@ const failureSchema = {
     type: DataTypes.INTEGER,
     allowNull: false,
     field: 'responsible_sector_id'
+  },
+  inconsistencyTypeId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    field: 'inconsistency_type_id',
+    references: {
+      model: 'inconsistency_types',
+      key: 'id'
+    }
   }
 };
 
@@ -180,11 +189,9 @@ Failure.associate = (models) => {
     as: 'form'
   });
 
-  Failure.belongsToMany(models.InconsistencyType, {
-    through: 'failure_inconsistency_types',
-    foreignKey: 'failureId', 
-    otherKey: 'inconsistencyTypeId',
-    as: 'inconsistencyTypes'
+  Failure.belongsTo(models.InconsistencyType, {
+    foreignKey: 'inconsistencyTypeId',
+    as: 'inconsistencyType'
   });
 };
 

@@ -90,25 +90,25 @@ exports.createFailure = async (req, res) => {
 
     const {
       medicalRecordCode,
-      formularioId,
+      formId,
       formularioDate,
       professionalId,
       hospitalId,
       sectorId,
       observacoes,
-      inconsistencyTypeIds,
+      inconsistencyTypeId,
       createUser
     } = req.body;
 
     // Adicionar log para debug
     console.log('Dados recebidos:', {
       medicalRecordCode,
-      formularioId,
+      formId,
       formularioDate,
       professionalId,
       hospitalId,
       sectorId,
-      inconsistencyTypeIds,
+      inconsistencyTypeId,
       createUser
     });
 
@@ -127,10 +127,18 @@ exports.createFailure = async (req, res) => {
       });
     }
 
+    if (!inconsistencyTypeId) {
+      return res.status(400).json({ error: 'Tipo de inconsistência é obrigatório' });
+    }
+
+    if (!formId) {
+      return res.status(400).json({ error: 'Formulário é obrigatório' });
+    }
+
     // Criar a falha com status padrão
     const newFailure = await Failure.create({
       medicalRecordCode,
-      formularioId,
+      formId,
       formularioDate: formularioDate || new Date(),
       professionalId,
       hospitalId,
@@ -140,15 +148,9 @@ exports.createFailure = async (req, res) => {
       status: 'Pending', // Adicionando status padrão
       createdAt: new Date(), // Adicionando data de criação
       sectorResponsibleId: sectorId, // Usar o setor recebido
-      sectorReporterId: 10 // ALA B por padrão (comente para editar esse trecho quando tivermos tabelas user)
+      sectorReporterId: 10, // ALA B por padrão (comente para editar esse trecho quando tivermos tabelas user)
+      inconsistencyTypeId
     }, { transaction });
-
-    // Associar as inconsistências
-    if (inconsistencyTypeIds?.length > 0) {
-      await Promise.all(inconsistencyTypeIds.map(async (inconsistencyTypeId) => {
-        await newFailure.addInconsistencyType(inconsistencyTypeId, { transaction });
-      }));
-    }
 
     await transaction.commit();
 
@@ -156,7 +158,7 @@ exports.createFailure = async (req, res) => {
     const createdFailure = await Failure.findByPk(newFailure.id, {
       include: [
         { model: Form, as: 'formulario' },
-        { model: InconsistencyType, as: 'inconsistencyTypes' },
+        { model: InconsistencyType, as: 'inconsistencyType' },
         { model: Hospital, as: 'hospital' },
         { model: Sector, as: 'sector' }
       ]
@@ -176,7 +178,7 @@ exports.createFailure = async (req, res) => {
 // Atualizar uma falha existente
 exports.updateFailure = async (req, res) => {
   const { id } = req.params;
-  const { medicalRecordCode, formularioId, formularioDate, inconsistencyTypeIds, professionalId, hospitalId, sectorId, status, updateUser, observacoes } = req.body;
+  const { medicalRecordCode, formId, formularioDate, inconsistencyTypeId, professionalId, hospitalId, sectorId, status, updateUser, observacoes } = req.body;
   const transaction = await sequelize.transaction();
 
   try {
@@ -189,7 +191,7 @@ exports.updateFailure = async (req, res) => {
     await failure.update(
       {
         medicalRecordCode,
-        formularioId,
+        formId,
         formularioDate,
         professionalId,
         hospitalId,
@@ -197,23 +199,10 @@ exports.updateFailure = async (req, res) => {
         status,
         updateUser,
         observacoes,
+        inconsistencyTypeId
       },
       { transaction }
     );
-
-    // Atualizar associações de InconsistencyType
-    if (Array.isArray(inconsistencyTypeIds)) {
-      const inconsistencyTypes = await InconsistencyType.findAll({
-        where: { id: inconsistencyTypeIds },
-        transaction,
-      });
-
-      if (inconsistencyTypes.length !== inconsistencyTypeIds.length) {
-        throw new Error('Algumas InconsistencyTypes fornecidas não foram encontradas.');
-      }
-
-      await failure.setInconsistencyTypes(inconsistencyTypes, { transaction });
-    }
 
     // Commit da transação
     await transaction.commit();
@@ -222,7 +211,7 @@ exports.updateFailure = async (req, res) => {
     const updatedFailure = await Failure.findByPk(id, {
       include: [
         { model: Form, as: 'formulario' },
-        { model: InconsistencyType, as: 'inconsistencyTypes', through: { attributes: [] } },
+        { model: InconsistencyType, as: 'inconsistencyType' },
         { model: Hospital, as: 'hospital' },
         { model: Sector, as: 'sector' }
       ],

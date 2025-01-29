@@ -8,7 +8,6 @@ const Sector = require('./Sector');
 const Professional = require('./Professional');
 const Failure = require('./Failure');
 const Form = require('./Form');
-const FailureInconsistencyType = require('./FailureInconsistencyType');
 const Indicator = require('./Indicator');
 const HospitalGroup = require('./HospitalGroup');
 const Patient = require('./Patient');
@@ -180,19 +179,15 @@ Failure.belongsTo(Hospital, {
 });
 
 // ======================
-// 10. Associações Many-to-Many
+// 10. Associações Atualizadas
 // ======================
-Failure.belongsToMany(InconsistencyType, {
-  through: FailureInconsistencyType,
-  foreignKey: 'failureId',
-  otherKey: 'inconsistencyTypeId',
-  as: 'inconsistencyTypes'
+Failure.belongsTo(InconsistencyType, {
+  foreignKey: 'inconsistencyTypeId',
+  as: 'inconsistencyType'
 });
 
-InconsistencyType.belongsToMany(Failure, {
-  through: FailureInconsistencyType,
+InconsistencyType.hasMany(Failure, {
   foreignKey: 'inconsistencyTypeId',
-  otherKey: 'failureId',
   as: 'failures'
 });
 
@@ -209,7 +204,6 @@ const models = {
   Form,
   InconsistencyType,
   Failure,
-  FailureInconsistencyType
 };
 
 // Sincronizar modelos em ordem

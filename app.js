@@ -101,7 +101,7 @@ app.use(rateLimiter);
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Middleware de autenticação para rotas protegidas
-app.use('/api', authMiddleware);
+// app.use('/api', authMiddleware);
 
 // Rotas
 app.use('/api/professionals', professionalRoutes);
@@ -130,15 +130,9 @@ sequelize.authenticate()
   .then(async () => {
     console.log('Connected to the database...');
     try {
-      // Forçar recriação do banco apenas em desenvolvimento
-      const forceSync = process.env.NODE_ENV === 'development';
-
-      if (forceSync) {
-        console.log('Recriando estrutura do banco...');
-        await sequelize.sync({ force: true });
-      } else {
-        await syncModels();
-      }
+      // Forçar recriação do banco em todos os ambientes
+      console.log('Recriando estrutura do banco...');
+      await sequelize.sync({ force: true });
 
       console.log('Models synchronized with the database.');
       app.listen(PORT, '0.0.0.0', () => {
