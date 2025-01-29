@@ -2,8 +2,7 @@
 const {
   Failure,
   Form,
-  TPInconsistencies,
-  Responsible,
+  InconsistencyType,
   Hospital,
   Sector,
   sequelize
@@ -27,18 +26,17 @@ exports.getAllFailures = async (req, res) => {
           attributes: ['id', 'name']
         },
         {
-          model: TPInconsistencies,
-          as: 'tpInconsistencies', // Adicionando o alias aqui
-          through: { attributes: [] },
-          attributes: ['id', 'description', 'status']
+          model: InconsistencyType,
+          as: 'inconsistencyTypes',
+          through: { attributes: [] }
         }
       ],
       attributes: [
         'id',
-        'prontuarioCode',
+        'medicalRecordCode',
         'status',
-        'createDate',
-        'updateDate'
+        'createdAt',
+        'updatedAt'
       ],
       raw: false,
       nest: true
@@ -67,8 +65,7 @@ exports.getFailureById = async (req, res) => {
     const failure = await Failure.findByPk(id, {
       include: [
         { model: Form, as: 'formulario' },
-        { model: TPInconsistencies, as: 'tpInconsistencies', through: { attributes: [] } },
-        { model: Responsible, as: 'responsible' },
+        { model: InconsistencyType, as: 'inconsistencyTypes', through: { attributes: [] } },
         { model: Hospital, as: 'hospital' },
         { model: Sector, as: 'sector' }
       ],
@@ -92,26 +89,26 @@ exports.createFailure = async (req, res) => {
     transaction = await sequelize.transaction();
 
     const {
-      prontuarioCode,
+      medicalRecordCode,
       formularioId,
       formularioDate,
       professionalId,
       hospitalId,
       sectorId,
       observacoes,
-      tpInconsistenciaIds,
+      inconsistencyTypeIds,
       createUser
     } = req.body;
 
     // Adicionar log para debug
     console.log('Dados recebidos:', {
-      prontuarioCode,
+      medicalRecordCode,
       formularioId,
       formularioDate,
       professionalId,
       hospitalId,
       sectorId,
-      tpInconsistenciaIds,
+      inconsistencyTypeIds,
       createUser
     });
 
@@ -123,7 +120,7 @@ exports.createFailure = async (req, res) => {
       return res.status(400).json({
         status: 'error',
         message: `Hospital com ID ${hospitalId} não encontrado`,
-        debug: { 
+        debug: {
           receivedId: hospitalId,
           type: typeof hospitalId
         }
@@ -132,7 +129,7 @@ exports.createFailure = async (req, res) => {
 
     // Criar a falha com status padrão
     const newFailure = await Failure.create({
-      prontuarioCode,
+      medicalRecordCode,
       formularioId,
       formularioDate: formularioDate || new Date(),
       professionalId,
@@ -141,15 +138,15 @@ exports.createFailure = async (req, res) => {
       observacoes,
       createUser,
       status: 'Pending', // Adicionando status padrão
-      createDate: new Date(), // Adicionando data de criação
+      createdAt: new Date(), // Adicionando data de criação
       sectorResponsibleId: sectorId, // Usar o setor recebido
       sectorReporterId: 10 // ALA B por padrão (comente para editar esse trecho quando tivermos tabelas user)
     }, { transaction });
 
     // Associar as inconsistências
-    if (tpInconsistenciaIds?.length > 0) {
-      await Promise.all(tpInconsistenciaIds.map(async (tpInconsistenciaId) => {
-        await newFailure.addTpInconsistency(tpInconsistenciaId, { transaction });
+    if (inconsistencyTypeIds?.length > 0) {
+      await Promise.all(inconsistencyTypeIds.map(async (inconsistencyTypeId) => {
+        await newFailure.addInconsistencyType(inconsistencyTypeId, { transaction });
       }));
     }
 
@@ -159,8 +156,7 @@ exports.createFailure = async (req, res) => {
     const createdFailure = await Failure.findByPk(newFailure.id, {
       include: [
         { model: Form, as: 'formulario' },
-        { model: TPInconsistencies, as: 'tpInconsistencies' },
-        { model: Responsible, as: 'responsible' },
+        { model: InconsistencyType, as: 'inconsistencyTypes' },
         { model: Hospital, as: 'hospital' },
         { model: Sector, as: 'sector' }
       ]
@@ -180,7 +176,7 @@ exports.createFailure = async (req, res) => {
 // Atualizar uma falha existente
 exports.updateFailure = async (req, res) => {
   const { id } = req.params;
-  const { prontuarioCode, formularioId, formularioDate, tpInconsistenciaIds, professionalId, hospitalId, sectorId, status, updateUser, observacoes } = req.body;
+  const { medicalRecordCode, formularioId, formularioDate, inconsistencyTypeIds, professionalId, hospitalId, sectorId, status, updateUser, observacoes } = req.body;
   const transaction = await sequelize.transaction();
 
   try {
@@ -192,7 +188,7 @@ exports.updateFailure = async (req, res) => {
     // Atualizar campos
     await failure.update(
       {
-        prontuarioCode,
+        medicalRecordCode,
         formularioId,
         formularioDate,
         professionalId,
@@ -205,18 +201,18 @@ exports.updateFailure = async (req, res) => {
       { transaction }
     );
 
-    // Atualizar associações de TPInconsistencies
-    if (Array.isArray(tpInconsistenciaIds)) {
-      const tpInconsistencies = await TPInconsistencies.findAll({
-        where: { id: tpInconsistenciaIds },
+    // Atualizar associações de InconsistencyType
+    if (Array.isArray(inconsistencyTypeIds)) {
+      const inconsistencyTypes = await InconsistencyType.findAll({
+        where: { id: inconsistencyTypeIds },
         transaction,
       });
 
-      if (tpInconsistencies.length !== tpInconsistenciaIds.length) {
-        throw new Error('Algumas TPInconsistencies fornecidas não foram encontradas.');
+      if (inconsistencyTypes.length !== inconsistencyTypeIds.length) {
+        throw new Error('Algumas InconsistencyTypes fornecidas não foram encontradas.');
       }
 
-      await failure.setTpInconsistencies(tpInconsistencies, { transaction });
+      await failure.setInconsistencyTypes(inconsistencyTypes, { transaction });
     }
 
     // Commit da transação
@@ -226,8 +222,7 @@ exports.updateFailure = async (req, res) => {
     const updatedFailure = await Failure.findByPk(id, {
       include: [
         { model: Form, as: 'formulario' },
-        { model: TPInconsistencies, as: 'tpInconsistencies', through: { attributes: [] } },
-        { model: Responsible, as: 'responsible' },
+        { model: InconsistencyType, as: 'inconsistencyTypes', through: { attributes: [] } },
         { model: Hospital, as: 'hospital' },
         { model: Sector, as: 'sector' }
       ],

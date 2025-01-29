@@ -3,11 +3,11 @@ const { Form, Failure, TPInconsistencies, Responsible, Hospital, Sector, sequeli
 
 const validateFailureData = (failureData) => {
   const requiredFields = [
-    'prontuarioCode',
+    'medicalRecordCode',
     'professionalId',
     'hospitalId',
     'sectorId',
-    'tpInconsistenciaIds'
+    'inconsistencyTypeIds'
   ];
 
   for (const field of requiredFields) {
@@ -29,13 +29,13 @@ const validateFailureData = (failureData) => {
     throw new Error('sectorId deve ser um número válido');
   }
 
-  // Validar formularioId existente
-  if (!failureData.formularioId) {
-    throw new Error('Campo obrigatório ausente: formularioId');
+  // Validar formId existente
+  if (!failureData.formId) {
+    throw new Error('Campo obrigatório ausente: formId');
   }
 
-  if (isNaN(Number(failureData.formularioId))) {
-    throw new Error('formularioId deve ser um número válido');
+  if (isNaN(Number(failureData.formId))) {
+    throw new Error('formId deve ser um número válido');
   }
 
   // Validar data do formulário
@@ -43,7 +43,7 @@ const validateFailureData = (failureData) => {
     throw new Error('Data do formulário inválida');
   }
 
-  if (!Array.isArray(failureData.tpInconsistenciaIds) || failureData.tpInconsistenciaIds.length === 0) {
+  if (!Array.isArray(failureData.inconsistencyTypeIds) || failureData.inconsistencyTypeIds.length === 0) {
     throw new Error('É necessário informar pelo menos uma inconsistência');
   }
 };
@@ -68,9 +68,9 @@ exports.createFormWithFailures = async (req, res) => {
       throw new Error('Campo "createUser" é obrigatório.');
     }
     for (const failureData of failures) {
-      const form = await Form.findByPk(failureData.formularioId);
+      const form = await Form.findByPk(failureData.formId);
       if (!form) {
-        throw new Error(`Formulário com ID ${failureData.formularioId} não encontrado.`);
+        throw new Error(`Formulário com ID ${failureData.formId} não encontrado.`);
       }
       await Failure.create({
         ...failureData,
@@ -87,15 +87,15 @@ exports.createFormWithFailures = async (req, res) => {
 exports.getAllForms = async (req, res) => {
   try {
     console.log('Iniciando busca de formulários...');
-    
+
     // Logar a query SQL
     const forms = await Form.findAll({
       logging: console.log // Isso vai mostrar a SQL gerada
     });
-    
+
     console.log('Formulários encontrados:', forms);
     console.log('Raw data:', forms.map(f => f.get({ plain: true })));
-    
+
     res.status(200).json(forms);
   } catch (error) {
     console.error('Erro detalhado:', error);

@@ -8,24 +8,78 @@ const failureSchema = {
     primaryKey: true,
     autoIncrement: true
   },
-  prontuarioCode: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    field: 'prontuario_code'
-  },
-  formularioId: {
+  medicalRecordId: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    field: 'formulario_id'
+    field: 'medical_record_id',
+    references: {
+      model: 'medical_records',
+      key: 'id'
+    }
   },
-  formularioDate: {
+  medicalRecordCode: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    field: 'medical_record_code'
+  },
+  patientId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    field: 'patient_id',
+    references: {
+      model: 'patients',
+      key: 'id'
+    }
+  },
+  internmentId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    field: 'internment_id',
+    references: {
+      model: 'internments',
+      key: 'id'
+    }
+  },
+  formId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    field: 'form_id'
+  },
+  formDate: {
     type: DataTypes.DATE,
-    allowNull: true
+    allowNull: true,
+    field: 'form_date',
+    validate: {
+      isWithinAdmissionPeriod() {
+        if (this.medicalRecord && this.formDate) {
+          const { admissionStartDate, admissionEndDate } = this.medicalRecord;
+          if (admissionStartDate && this.formDate < admissionStartDate) {
+            throw new Error('Form date must be after admission start date');
+          }
+          if (admissionEndDate && this.formDate > admissionEndDate) {
+            throw new Error('Form date must be before admission end date');
+          }
+        }
+      }
+    }
   },
   professionalId: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    field: 'professional_id'
+    field: 'professional_id',
+    references: {
+      model: 'professionals',
+      key: 'id'
+    }
+  },
+  auditorId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    field: 'auditor_id',
+    references: {
+      model: 'professionals',
+      key: 'id'
+    }
   },
   hospitalId: {
     type: DataTypes.INTEGER,
@@ -47,49 +101,47 @@ const failureSchema = {
   },
   createDate: {
     type: DataTypes.DATE,
-    allowNull: true
+    allowNull: true,
+    field: 'create_date'
   },
   createUser: {
     type: DataTypes.INTEGER,
-    allowNull: true
+    allowNull: true,
+    field: 'create_user'
   },
   updateDate: {
     type: DataTypes.DATE,
-    allowNull: true
+    allowNull: true,
+    field: 'update_date'
   },
   updateUser: {
     type: DataTypes.INTEGER,
-    allowNull: true
+    allowNull: true,
+    field: 'update_user'
   },
-  observacoes: {
+  notes: {
     type: DataTypes.TEXT,
     allowNull: true
   },
   resolvedAt: {
     type: DataTypes.DATE,
-    allowNull: true
+    allowNull: true,
+    field: 'resolved_at'
   },
-  sectorReporterId: {
+  reportingSectorId: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    references: {
-      model: 'sectors',
-      key: 'id'
-    },
-    defaultValue: 10 // ALA B por padrão (trocar setor do user quando user for criado)
+    field: 'reporting_sector_id'
   },
-  sectorResponsibleId: {
+  responsibleSectorId: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    references: {
-      model: 'sectors',
-      key: 'id'
-    }
+    field: 'responsible_sector_id'
   }
 };
 
 const Failure = sequelize.define('Failure', failureSchema, {
-  tableName: 'failures', // Importante: nome da tabela em minúsculo
+  tableName: 'failures',
   timestamps: true,
   createdAt: 'createDate',
   updatedAt: 'updateDate',
@@ -98,11 +150,52 @@ const Failure = sequelize.define('Failure', failureSchema, {
 });
 
 Failure.associate = (models) => {
-  Failure.belongsTo(models.Responsible, {
+  Failure.belongsTo(models.Professional, {
     foreignKey: 'professionalId',
-    as: 'responsible'
+    as: 'professional'
   });
-  // ...outras associações existentes
+
+  Failure.belongsTo(models.Professional, {
+    foreignKey: 'auditorId',
+    as: 'auditor'
+  });
+
+  Failure.belongsTo(models.Patient, {
+    foreignKey: 'patientId',
+    as: 'patient'
+  });
+
+  Failure.belongsTo(models.Internment, {
+    foreignKey: 'internmentId',
+    as: 'internment'
+  });
+
+  Failure.belongsTo(models.MedicalRecord, {
+    foreignKey: 'medicalRecordId',
+    as: 'medicalRecord'
+  });
+
+  Failure.belongsTo(models.Hospital, {
+    foreignKey: 'hospitalId',
+    as: 'hospital'
+  });
+
+  Failure.belongsTo(models.Sector, {
+    foreignKey: 'sectorId',
+    as: 'sector'
+  });
+
+  Failure.belongsTo(models.Form, {
+    foreignKey: 'formId',
+    as: 'form'
+  });
+
+  Failure.belongsToMany(models.TPInconsistencies, {
+    through: 'failure_tp_inconsistencies',
+    foreignKey: 'failureId',
+    otherKey: 'tpInconsistencyId',
+    as: 'tpInconsistencies'
+  });
 };
 
 module.exports = Failure;

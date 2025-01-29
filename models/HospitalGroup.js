@@ -12,26 +12,36 @@ const HospitalGroup = sequelize.define('HospitalGroup', {
     type: DataTypes.STRING(20),
     allowNull: false,
   },
+  subGroup: {
+    type: DataTypes.STRING(50),
+    allowNull: true,
+    field: 'sub_group'
+  },
   createDate: { // CREATE_DATE
     type: DataTypes.DATE,
     allowNull: true,
     defaultValue: DataTypes.NOW,
+    field: 'create_date'
   },
   createUser: { // CREATE_USER
     type: DataTypes.INTEGER,
     allowNull: true,
+    field: 'create_user'
   },
   updateDate: { // UPDATE_DATE
     type: DataTypes.DATE,
     allowNull: true,
+    field: 'update_date'
   },
   updateUser: { // UPDATE_USER
     type: DataTypes.INTEGER,
     allowNull: true,
+    field: 'update_user'
   },
 }, {
   tableName: 'hospital_groups',
   timestamps: false,
+  underscored: true
 });
 
 module.exports = HospitalGroup;

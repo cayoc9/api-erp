@@ -5,13 +5,16 @@ const sequelize = require('../config/database');
 // Importação dos modelos
 const Hospital = require('./Hospital');
 const Sector = require('./Sector');
-const Responsible = require('./Responsible');
+const Professional = require('./Professional');
 const Failure = require('./Failure');
 const Form = require('./Form');
 const TPInconsistencies = require('./TP_Inconsistencies');
-const FailureTPInconsistencies = require('./FailureTP_Inconsistencies');
+const FailureInconsistencyType = require('./FailureInconsistencyType');
 const Indicator = require('./Indicator');
 const HospitalGroup = require('./HospitalGroup');
+const Patient = require('./Patient');
+const Internment = require('./Internment');
+const MedicalRecord = require('./MedicalRecord');
 
 // Definição das associações
 
@@ -27,28 +30,52 @@ Sector.belongsTo(Hospital, { foreignKey: 'hospitalId', as: 'hospital' });
 Sector.hasMany(Failure, { foreignKey: 'sectorId', as: 'failures' });
 Failure.belongsTo(Sector, { foreignKey: 'sectorId', as: 'sector' });
 
-// 4. Relações de Responsible e Failure
-Responsible.hasMany(Failure, { foreignKey: 'professionalId', as: 'failures' });
-Failure.belongsTo(Responsible, { foreignKey: 'professionalId', as: 'responsible' });
+// 4. Relações de Professional e Failure
+Professional.hasMany(Failure, {
+  foreignKey: 'professionalId',
+  as: 'failures'
+});
+Professional.hasMany(Failure, {
+  foreignKey: 'auditorId',
+  as: 'audits'
+});
+Failure.belongsTo(Professional, { foreignKey: 'professionalId', as: 'professional' });
+Failure.belongsTo(Professional, { foreignKey: 'auditorId', as: 'auditor' });
 
 // 5. Relações de Form e Failure
-Form.hasMany(Failure, { foreignKey: 'formularioId', as: 'failures' });
-Failure.belongsTo(Form, { foreignKey: 'formularioId', as: 'formulario' });
+Form.hasMany(Failure, { foreignKey: 'formId', as: 'failures' });
+Failure.belongsTo(Form, { foreignKey: 'formId', as: 'form' });
 
-// 6. Relação Muitos-para-Muitos entre Failure e TPInconsistencies via FailureTPInconsistencies
+// 6. Relação Muitos-para-Muitos entre Failure e TPInconsistencies
 Failure.belongsToMany(TPInconsistencies, {
-  through: FailureTPInconsistencies,
+  through: FailureInconsistencyType,
   foreignKey: 'failureId',
-  otherKey: 'tpInconsistencyId',
-  as: 'tpInconsistencies',
+  otherKey: 'inconsistencyTypeId',
+  as: 'inconsistencyTypes'
 });
 
 TPInconsistencies.belongsToMany(Failure, {
-  through: FailureTPInconsistencies,
-  foreignKey: 'tpInconsistencyId',
+  through: FailureInconsistencyType,
+  foreignKey: 'inconsistencyTypeId',
   otherKey: 'failureId',
-  as: 'failures',
+  as: 'failures'
 });
+
+// 7. Relações de Patient
+Patient.hasMany(Internment, { foreignKey: 'patientId', as: 'internments' });
+Patient.hasMany(MedicalRecord, { foreignKey: 'patientId', as: 'medicalRecords' });
+
+// 8. Relações de Internment
+Internment.belongsTo(Patient, { foreignKey: 'patientId', as: 'patient' });
+Internment.belongsTo(Sector, { foreignKey: 'dischargeSectorId', as: 'dischargeSector' });
+Internment.hasMany(Failure, { foreignKey: 'internmentId', as: 'failures' });
+
+// 9. Relações de MedicalRecord
+MedicalRecord.belongsTo(Professional, { foreignKey: 'auditorId', as: 'auditor' });
+MedicalRecord.belongsTo(Sector, { foreignKey: 'auditorSectorId', as: 'auditorSector' });
+MedicalRecord.belongsTo(Patient, { foreignKey: 'patientId', as: 'patient' });
+MedicalRecord.belongsTo(Sector, { foreignKey: 'dischargeSectorId', as: 'dischargeSector' });
+MedicalRecord.hasMany(Failure, { foreignKey: 'medicalRecordId', as: 'failures' });
 
 // Associações para sectorReporter e sectorResponsible
 Failure.belongsTo(Sector, {
@@ -72,17 +99,32 @@ Failure.belongsTo(Hospital, {
   as: 'hospital'
 });
 
+// Definir ordem de sincronização
+const models = {
+  HospitalGroup,
+  Hospital,
+  Sector,
+  Professional,
+  Patient,
+  MedicalRecord,
+  Internment,
+  Form,
+  TPInconsistencies,
+  Failure,
+  FailureInconsistencyType
+};
+
+// Sincronizar modelos em ordem
+const syncModels = async () => {
+  for (const modelName of Object.keys(models)) {
+    await models[modelName].sync();
+  }
+};
+
 // Exportação dos modelos e da instância do Sequelize
 module.exports = {
   sequelize,
   Sequelize,
-  Hospital,
-  Sector,
-  Responsible,
-  Failure,
-  Form,
-  TPInconsistencies,
-  FailureTPInconsistencies,
-  Indicator,
-  HospitalGroup,
+  ...models,
+  syncModels
 };

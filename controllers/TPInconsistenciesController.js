@@ -7,7 +7,7 @@
  * - deleteTPInconsistency: remove um registro
  */
 
-const { TPInconsistencies, Failure } = require('../models');
+const { InconsistencyType } = require('../models');
 
 /**
  * GET /api/tp-inconsistencies
@@ -16,7 +16,7 @@ const { TPInconsistencies, Failure } = require('../models');
 exports.getAllTPInconsistencies = async (req, res) => {
   console.log('GET /api/tp-inconsistencies - Início da requisição');
   try {
-    const tpInconsistencies = await TPInconsistencies.findAll({
+    const tpInconsistencies = await InconsistencyType.findAll({
       include: [{ model: Failure, as: 'failures' }],
     });
     console.log('GET /api/tp-inconsistencies - Sucesso na obtenção das inconsistências');
@@ -35,7 +35,7 @@ exports.getTPInconsistencyById = async (req, res) => {
   const { id } = req.params;
   console.log(`GET /api/tp-inconsistencies/${id} - Início da requisição`);
   try {
-    const tpInconsistency = await TPInconsistencies.findByPk(id, {
+    const tpInconsistency = await InconsistencyType.findByPk(id, {
       include: [{ model: Failure, as: 'failures' }],
     });
     if (tpInconsistency) {
@@ -59,7 +59,7 @@ exports.createTPInconsistency = async (req, res) => {
   const { description, status, createUser } = req.body;
   console.log('POST /api/tp-inconsistencies - Início da requisição', { description, status, createUser });
   try {
-    const newTPInconsistency = await TPInconsistencies.create({ description, status, createUser });
+    const newTPInconsistency = await InconsistencyType.create({ description, status, createUser });
     console.log('POST /api/tp-inconsistencies - Inconsistência criada com sucesso', newTPInconsistency);
     res.status(201).json(newTPInconsistency);
   } catch (error) {
@@ -77,7 +77,7 @@ exports.updateTPInconsistency = async (req, res) => {
   const { description, status, updateUser } = req.body;
   console.log(`PUT /api/tp-inconsistencies/${id} - Início da requisição`, { description, status, updateUser });
   try {
-    const tpInconsistency = await TPInconsistencies.findByPk(id);
+    const tpInconsistency = await InconsistencyType.findByPk(id);
     if (!tpInconsistency) {
       console.warn(`PUT /api/tp-inconsistencies/${id} - Inconsistência não encontrada`);
       return res.status(404).json({ message: 'TP Inconsistency não encontrada.' });
@@ -100,7 +100,7 @@ exports.deleteTPInconsistency = async (req, res) => {
   const { id } = req.params;
   console.log(`DELETE /api/tp-inconsistencies/${id} - Início da requisição`);
   try {
-    const tpInconsistency = await TPInconsistencies.findByPk(id);
+    const tpInconsistency = await InconsistencyType.findByPk(id);
     if (!tpInconsistency) {
       console.warn(`DELETE /api/tp-inconsistencies/${id} - Inconsistência não encontrada`);
       return res.status(404).json({ message: 'TP Inconsistency não encontrada.' });

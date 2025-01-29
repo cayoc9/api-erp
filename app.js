@@ -4,18 +4,21 @@ const express = require('express');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
-const { sequelize } = require('./models'); // Importa a instância do Sequelize e os modelos
+const { sequelize, syncModels } = require('./models'); // Importa a instância do Sequelize e os modelos
 
 // Importar rotas
 const sectorRoutes = require('./routes/sectors');
-const responsibleRoutes = require('./routes/responsibles');
+const professionalRoutes = require('./routes/professionals');
 const failureRoutes = require('./routes/failures');
 const indicatorRoutes = require('./routes/indicators');
 const hospitalRoutes = require('./routes/hospitals');
 const formRoutes = require('./routes/forms'); // Rota de forms
-const tpInconsistenciesRoutes = require('./routes/tp-inconsistencies');
+const inconsistencyTypeRoutes = require('./routes/inconsistency-types');
 const hospitalGroupRoutes = require('./routes/hospital-groups'); // Rota de hospital-groups
 const statisticsRoutes = require('./routes/statistics'); // Rota de statistics
+const patientRoutes = require('./routes/patients');
+const internmentRoutes = require('./routes/internments');
+const medicalRecordRoutes = require('./routes/medical-records');
 
 // Importar middlewares
 const authMiddleware = require('./middlewares/auth');
@@ -23,6 +26,8 @@ const requestLogger = require('./middlewares/requestLogger');
 const rateLimiter = require('./middlewares/rateLimiter');
 
 const app = express();
+// habilitar o proxy
+app.set('trust proxy', 1);
 
 const options = {
   definition: {
@@ -78,15 +83,18 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.use('/api', authMiddleware);
 
 // Rotas
-app.use('/api/responsibles', responsibleRoutes);
+app.use('/api/professionals', professionalRoutes);
 app.use('/api/forms', formRoutes);
-app.use('/api/tp-inconsistencies', tpInconsistenciesRoutes);
+app.use('/api/inconsistency-types', inconsistencyTypeRoutes);
 app.use('/api/sectors', sectorRoutes);
 app.use('/api/failures', failureRoutes);
 app.use('/api/indicators', indicatorRoutes);
 app.use('/api/hospitals', hospitalRoutes);
 app.use('/api/hospital-groups', hospitalGroupRoutes);
 app.use('/api/statistics', statisticsRoutes);
+app.use('/api/patients', patientRoutes);
+app.use('/api/internments', internmentRoutes);
+app.use('/api/medical-records', medicalRecordRoutes);
 
 // Global error handling middleware
 app.use(errorHandler);
@@ -98,17 +106,27 @@ const PORT = process.env.PORT || 5000;
  * Por fim, iniciamos o servidor.
  */
 sequelize.authenticate()
-  .then(() => {
+  .then(async () => {
     console.log('Connected to the database...');
-    return sequelize.sync({ alter: false }); // Em desenvolvimento apenas
-  })
-  .then(() => {
-    console.log('Models synchronized with the database.');
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Server running on port ${PORT}`);
-    });
+    try {
+      // Primeiro, dropar todas as tabelas se force: true
+      if (process.env.NODE_ENV === 'development') {
+        await sequelize.drop();
+      }
+
+      // Sincronizar modelos em ordem
+      await syncModels();
+
+      console.log('Models synchronized with the database.');
+      app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+    } catch (error) {
+      console.error('Error synchronizing models:', error);
+      process.exit(1);
+    }
   })
   .catch(err => {
-    console.error('Error connecting or synchronizing models:', err);
+    console.error('Error connecting to database:', err);
     process.exit(1);
   });
