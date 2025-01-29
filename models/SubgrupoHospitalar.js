@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const BaseModel = require('./BaseModel');
+const BaseModel = require('./ModeloBase');
 
 class HospitalSubGroup extends BaseModel { }
 

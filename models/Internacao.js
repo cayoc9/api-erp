@@ -1,4 +1,4 @@
-const BaseModel = require('./BaseModel');
+const BaseModel = require('./ModeloBase');
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 

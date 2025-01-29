@@ -1,7 +1,7 @@
 // models/Sector.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const BaseModel = require('./BaseModel');
+const BaseModel = require('./ModeloBase');
 
 class Sector extends BaseModel { }
 

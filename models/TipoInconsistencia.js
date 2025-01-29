@@ -2,7 +2,7 @@
  * Model que representa os tipos de inconsistências (TPInconsistencies).
  * Armazena 'description', 'status' (se está ativo/inativo) e campos de tracking.
  */
-const BaseModel = require('./BaseModel');
+const BaseModel = require('./ModeloBase');
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
