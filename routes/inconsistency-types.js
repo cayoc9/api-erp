@@ -6,7 +6,7 @@
 
 const express = require('express');
 const router = express.Router();
-const tpInconsistenciesController = require('../controllers/TPInconsistenciesController');
+const tpInconsistenciesController = require('../controllers/InconsistencyTypeController');
 
 // GET /api/tp-inconsistencies - Lista todas as inconsistências
 router.get('/', tpInconsistenciesController.getAllTPInconsistencies);
