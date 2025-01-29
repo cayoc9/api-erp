@@ -29,19 +29,39 @@ const app = express();
 // habilitar o proxy
 app.set('trust proxy', 1);
 
-const options = {
+// Configurar opções do Swagger
+const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'API do Projeto',
+      title: 'API de Gestão Hospitalar',
       version: '1.0.0',
+      description: 'API para gerenciamento de falhas e inconsistências em prontuários médicos',
+      contact: {
+        name: "Equipe de Desenvolvimento",
+        email: "suporte@hospital.com"
+      }
     },
+    servers: [
+      {
+        url: process.env.API_BASE_URL,
+        description: 'Servidor de produção'
+      }
+    ],
+    components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
+    }
   },
   apis: ['./routes/*.js'], // Caminho para os arquivos de rota
 };
 
-const specs = swaggerJsdoc(options);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 // Error Handler
 const { errorHandler } = require('./utils/errorHandler');
@@ -49,13 +69,12 @@ const { errorHandler } = require('./utils/errorHandler');
 // Middlewares
 app.use(cors({
   origin: [
-    'http://localhost:5173',
-    'http://10.100.59.94:5173',
     'https://plataformas.icsf.com.br',
     'http://plataformas.icsf.com.br'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 app.use(express.json());
 
@@ -77,7 +96,7 @@ app.use(requestLogger);
 app.use(rateLimiter);
 
 // Rotas públicas
-app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs));
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Middleware de autenticação para rotas protegidas
 app.use('/api', authMiddleware);
@@ -109,17 +128,20 @@ sequelize.authenticate()
   .then(async () => {
     console.log('Connected to the database...');
     try {
-      // Primeiro, dropar todas as tabelas se force: true
-      if (process.env.NODE_ENV === 'development') {
-        await sequelize.drop();
-      }
+      // Forçar recriação do banco apenas em desenvolvimento
+      const forceSync = process.env.NODE_ENV === 'development';
 
-      // Sincronizar modelos em ordem
-      await syncModels();
+      if (forceSync) {
+        console.log('Recriando estrutura do banco...');
+        await sequelize.sync({ force: true });
+      } else {
+        await syncModels();
+      }
 
       console.log('Models synchronized with the database.');
       app.listen(PORT, '0.0.0.0', () => {
         console.log(`Server running on port ${PORT}`);
+        console.log(`Documentação disponível em: http://localhost:${PORT}/docs`);
       });
     } catch (error) {
       console.error('Error synchronizing models:', error);
