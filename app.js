@@ -69,6 +69,8 @@ const { errorHandler } = require('./utils/errorHandler');
 // Middlewares
 app.use(cors({
   origin: [
+    'http://localhost:5173',
+    'http://10.100.59.94:5173',
     'https://plataformas.icsf.com.br',
     'http://plataformas.icsf.com.br'
   ],
