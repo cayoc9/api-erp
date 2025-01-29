@@ -6,21 +6,21 @@
 
 const express = require('express');
 const router = express.Router();
-const tpInconsistenciesController = require('../controllers/InconsistencyTypeController');
+const InconsistencyTypeController = require('../controllers/InconsistencyTypeController');
 
 // GET /api/tp-inconsistencies - Lista todas as inconsistências
-router.get('/', tpInconsistenciesController.getAllTPInconsistencies);
+router.get('/', InconsistencyTypeController.getAllInconsistencyTypes);
 
 // GET /api/tp-inconsistencies/:id - Detalhes de uma inconsistência
-router.get('/:id', tpInconsistenciesController.getTPInconsistencyById);
+router.get('/:id', InconsistencyTypeController.getInconsistencyTypeById);
 
 // POST /api/tp-inconsistencies - Cria uma inconsistência
-router.post('/', tpInconsistenciesController.createTPInconsistency);
+router.post('/', InconsistencyTypeController.createInconsistencyType);
 
 // PUT /api/tp-inconsistencies/:id - Atualiza uma inconsistência
-router.put('/:id', tpInconsistenciesController.updateTPInconsistency);
+router.put('/:id', InconsistencyTypeController.updateInconsistencyType);
 
 // DELETE /api/tp-inconsistencies/:id - Remove uma inconsistência
-router.delete('/:id', tpInconsistenciesController.deleteTPInconsistency);
+router.delete('/:id', InconsistencyTypeController.deleteInconsistencyType);
 
 module.exports = router;

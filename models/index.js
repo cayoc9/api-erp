@@ -8,7 +8,6 @@ const Sector = require('./Sector');
 const Professional = require('./Professional');
 const Failure = require('./Failure');
 const Form = require('./Form');
-const TPInconsistencies = require('./InconsistencyType ');
 const FailureInconsistencyType = require('./FailureInconsistencyType');
 const Indicator = require('./Indicator');
 const HospitalGroup = require('./HospitalGroup');
@@ -16,10 +15,11 @@ const Patient = require('./Patient');
 const Internment = require('./Internment');
 const MedicalRecord = require('./MedicalRecord');
 const HospitalSubGroup = require('./HospitalSubGroup');
+const InconsistencyType = require('./InconsistencyType.js');
 
-// Definição das associações
-
-// 1. Relações de HospitalGroup e Hospital
+// ======================
+// 1. Associações do HospitalGroup
+// ======================
 HospitalGroup.hasMany(HospitalSubGroup, {
   foreignKey: 'groupId',
   as: 'subGroups'
@@ -30,6 +30,9 @@ HospitalSubGroup.belongsTo(HospitalGroup, {
   as: 'hospitalGroup'
 });
 
+// ======================
+// 2. Associações do HospitalSubGroup
+// ======================
 HospitalSubGroup.hasMany(Hospital, {
   foreignKey: 'subGroupId',
   as: 'hospitals'
@@ -40,62 +43,127 @@ Hospital.belongsTo(HospitalSubGroup, {
   as: 'hospitalSubGroup'
 });
 
-// 3. Relações de Hospital e Sector
-Hospital.hasMany(Sector, { foreignKey: 'hospitalId', as: 'sectors' });
-Sector.belongsTo(Hospital, { foreignKey: 'hospitalId', as: 'hospital' });
+// ======================
+// 3. Associações do Hospital
+// ======================
+Hospital.hasMany(Sector, {
+  foreignKey: 'hospitalId',
+  as: 'sectors'
+});
 
-// 4. Relações de Sector e Failure
-Sector.hasMany(Failure, { foreignKey: 'sectorId', as: 'failures' });
-Failure.belongsTo(Sector, { foreignKey: 'sectorId', as: 'sector' });
+Hospital.hasMany(Failure, {
+  foreignKey: 'hospitalId',
+  as: 'failures'
+});
 
-// 5. Relações de Professional e Failure
+// ======================
+// 4. Associações do Sector
+// ======================
+Sector.belongsTo(Hospital, {
+  foreignKey: 'hospitalId',
+  as: 'hospital'
+});
+
+Sector.hasMany(Failure, {
+  foreignKey: 'sectorId',
+  as: 'failures'
+});
+
+// ======================
+// 5. Associações do Professional
+// ======================
 Professional.hasMany(Failure, {
   foreignKey: 'professionalId',
   as: 'failures'
 });
+
 Professional.hasMany(Failure, {
   foreignKey: 'auditorId',
   as: 'audits'
 });
-Failure.belongsTo(Professional, { foreignKey: 'professionalId', as: 'professional' });
-Failure.belongsTo(Professional, { foreignKey: 'auditorId', as: 'auditor' });
 
-// 6. Relações de Form e Failure
-Form.hasMany(Failure, { foreignKey: 'formId', as: 'failures' });
-Failure.belongsTo(Form, { foreignKey: 'formId', as: 'form' });
-
-// 7. Relação Muitos-para-Muitos entre Failure e TPInconsistencies
-Failure.belongsToMany(TPInconsistencies, {
-  through: FailureInconsistencyType,
-  foreignKey: 'failureId',
-  otherKey: 'inconsistencyTypeId',
-  as: 'inconsistencyTypes'
+// ======================
+// 6. Associações do Patient
+// ======================
+Patient.hasMany(Internment, {
+  foreignKey: 'patientId',
+  as: 'internments'
 });
 
-TPInconsistencies.belongsToMany(Failure, {
-  through: FailureInconsistencyType,
-  foreignKey: 'inconsistencyTypeId',
-  otherKey: 'failureId',
+Patient.hasMany(MedicalRecord, {
+  foreignKey: 'patientId',
+  as: 'medicalRecords'
+});
+
+// ======================
+// 7. Associações do Internment
+// ======================
+Internment.belongsTo(Patient, {
+  foreignKey: 'patientId',
+  as: 'patient'
+});
+
+Internment.belongsTo(Sector, {
+  foreignKey: 'dischargeSectorId',
+  as: 'dischargeSector'
+});
+
+Internment.hasMany(Failure, {
+  foreignKey: 'internmentId',
   as: 'failures'
 });
 
-// 8. Relações de Patient
-Patient.hasMany(Internment, { foreignKey: 'patientId', as: 'internments' });
-Patient.hasMany(MedicalRecord, { foreignKey: 'patientId', as: 'medicalRecords' });
+// ======================
+// 8. Associações do MedicalRecord
+// ======================
+MedicalRecord.belongsTo(Professional, {
+  foreignKey: 'auditorId',
+  as: 'auditor'
+});
 
-// 9. Relações de Internment
-Internment.belongsTo(Patient, { foreignKey: 'patientId', as: 'patient' });
-Internment.belongsTo(Sector, { foreignKey: 'dischargeSectorId', as: 'dischargeSector' });
-Internment.hasMany(Failure, { foreignKey: 'internmentId', as: 'failures' });
+MedicalRecord.belongsTo(Sector, {
+  foreignKey: 'auditorSectorId',
+  as: 'auditorSector'
+});
 
-// 10. Relações de MedicalRecord
-MedicalRecord.belongsTo(Professional, { foreignKey: 'auditorId', as: 'auditor' });
-MedicalRecord.belongsTo(Sector, { foreignKey: 'auditorSectorId', as: 'auditorSector' });
-MedicalRecord.belongsTo(Patient, { foreignKey: 'patientId', as: 'patient' });
-MedicalRecord.belongsTo(Sector, { foreignKey: 'dischargeSectorId', as: 'dischargeSector' });
-MedicalRecord.hasMany(Failure, { foreignKey: 'medicalRecordId', as: 'failures' });
+MedicalRecord.belongsTo(Patient, {
+  foreignKey: 'patientId',
+  as: 'patient'
+});
 
-// Associações para sectorReporter e sectorResponsible
+MedicalRecord.belongsTo(Sector, {
+  foreignKey: 'dischargeSectorId',
+  as: 'dischargeSector'
+});
+
+MedicalRecord.hasMany(Failure, {
+  foreignKey: 'medicalRecordId',
+  as: 'failures'
+});
+
+// ======================
+// 9. Associações do Failure
+// ======================
+Failure.belongsTo(Professional, {
+  foreignKey: 'professionalId',
+  as: 'professional'
+});
+
+Failure.belongsTo(Professional, {
+  foreignKey: 'auditorId',
+  as: 'auditor'
+});
+
+Failure.belongsTo(Form, {
+  foreignKey: 'formId',
+  as: 'form'
+});
+
+Failure.belongsTo(MedicalRecord, {
+  foreignKey: 'medicalRecordId',
+  as: 'medicalRecord'
+});
+
 Failure.belongsTo(Sector, {
   foreignKey: 'sectorReporterId',
   as: 'sectorReporter'
@@ -106,15 +174,26 @@ Failure.belongsTo(Sector, {
   as: 'sectorResponsible'
 });
 
-// Adicionar/verificar relacionamento
-Hospital.hasMany(Failure, {
-  foreignKey: 'hospitalId',
-  as: 'failures'
-});
-
 Failure.belongsTo(Hospital, {
   foreignKey: 'hospitalId',
   as: 'hospital'
+});
+
+// ======================
+// 10. Associações Many-to-Many
+// ======================
+Failure.belongsToMany(InconsistencyType, {
+  through: FailureInconsistencyType,
+  foreignKey: 'failureId',
+  otherKey: 'inconsistencyTypeId',
+  as: 'inconsistencyTypes'
+});
+
+InconsistencyType.belongsToMany(Failure, {
+  through: FailureInconsistencyType,
+  foreignKey: 'inconsistencyTypeId',
+  otherKey: 'failureId',
+  as: 'failures'
 });
 
 // Definir ordem de sincronização
@@ -128,7 +207,7 @@ const models = {
   MedicalRecord,
   Internment,
   Form,
-  TPInconsistencies,
+  InconsistencyType,
   Failure,
   FailureInconsistencyType
 };

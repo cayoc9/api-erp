@@ -59,16 +59,7 @@ const professionalSchema = {
 };
 
 class Professional extends Model {
-    static associate(models) {
-        Professional.hasMany(models.Failure, {
-            foreignKey: 'professionalId',
-            as: 'failures'
-        });
-        Professional.hasMany(models.Failure, {
-            foreignKey: 'auditorId',
-            as: 'auditorias'
-        });
-    }
+    // Remover todo o bloco static associate
 }
 
 Professional.init(professionalSchema, {

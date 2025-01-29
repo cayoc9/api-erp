@@ -37,7 +37,7 @@ const medicalRecordController = require('../controllers/MedicalRecordController'
  *                 items:
  *                   type: object
  */
-router.post('/', medicalRecordController.create);
+router.post('/', medicalRecordController.createMedicalRecordWithFailures);
 
 /**
  * @swagger

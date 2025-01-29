@@ -13,16 +13,16 @@ const { InconsistencyType } = require('../models');
  * GET /api/tp-inconsistencies
  * Obtém todas as TPInconsistencies com suas falhas associadas.
  */
-exports.getAllTPInconsistencies = async (req, res) => {
-  console.log('GET /api/tp-inconsistencies - Início da requisição');
+exports.getAllInconsistencyTypes = async (req, res) => {
+  console.log('GET /api/inconsistency-types - Início da requisição');
   try {
-    const tpInconsistencies = await InconsistencyType.findAll({
+    const inconsistencyTypes = await InconsistencyType.findAll({
       include: [{ model: Failure, as: 'failures' }],
     });
-    console.log('GET /api/tp-inconsistencies - Sucesso na obtenção das inconsistências');
-    res.status(200).json(tpInconsistencies);
+    console.log('GET /api/inconsistency-types - Sucesso na obtenção');
+    res.status(200).json(inconsistencyTypes);
   } catch (error) {
-    console.error('GET /api/tp-inconsistencies - Erro:', error);
+    console.error('GET /api/inconsistency-types - Erro:', error);
     res.status(500).json({ message: 'Erro ao obter as TP Inconsistencies.', error: error.message });
   }
 };
@@ -31,7 +31,7 @@ exports.getAllTPInconsistencies = async (req, res) => {
  * GET /api/tp-inconsistencies/:id
  * Obtém uma TPInconsistency específica por ID com suas falhas associadas.
  */
-exports.getTPInconsistencyById = async (req, res) => {
+exports.getInconsistencyTypeById = async (req, res) => {
   const { id } = req.params;
   console.log(`GET /api/tp-inconsistencies/${id} - Início da requisição`);
   try {
@@ -55,7 +55,7 @@ exports.getTPInconsistencyById = async (req, res) => {
  * POST /api/tp-inconsistencies
  * Cria uma nova TPInconsistency.
  */
-exports.createTPInconsistency = async (req, res) => {
+exports.createInconsistencyType = async (req, res) => {
   const { description, status, createUser } = req.body;
   console.log('POST /api/tp-inconsistencies - Início da requisição', { description, status, createUser });
   try {
@@ -72,7 +72,7 @@ exports.createTPInconsistency = async (req, res) => {
  * PUT /api/tp-inconsistencies/:id
  * Atualiza uma TPInconsistency existente.
  */
-exports.updateTPInconsistency = async (req, res) => {
+exports.updateInconsistencyType = async (req, res) => {
   const { id } = req.params;
   const { description, status, updateUser } = req.body;
   console.log(`PUT /api/tp-inconsistencies/${id} - Início da requisição`, { description, status, updateUser });
@@ -96,7 +96,7 @@ exports.updateTPInconsistency = async (req, res) => {
  * DELETE /api/tp-inconsistencies/:id
  * Remove uma TPInconsistency existente.
  */
-exports.deleteTPInconsistency = async (req, res) => {
+exports.deleteInconsistencyType = async (req, res) => {
   const { id } = req.params;
   console.log(`DELETE /api/tp-inconsistencies/${id} - Início da requisição`);
   try {

@@ -11,7 +11,7 @@ const medicalRecordSchema = {
     type: DataTypes.STRING(50),
     allowNull: false,
     field: 'medical_record_number',
-    unique: true
+    unique: false
   },
   auditorId: {
     type: DataTypes.INTEGER,

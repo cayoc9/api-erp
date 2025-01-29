@@ -286,4 +286,31 @@ exports.removeFailure = async (req, res) => {
         console.error('Erro ao remover falha:', error);
         res.status(500).json({ message: error.message });
     }
+};
+
+exports.createMedicalRecordWithFailures = async (req, res) => {
+    const transaction = await sequelize.transaction();
+    try {
+        const { medicalRecordData, failures } = req.body;
+
+        // 1. Criar MedicalRecord
+        const newMedicalRecord = await MedicalRecord.create(medicalRecordData, { transaction });
+
+        // 2. Criar Failures associadas
+        const createdFailures = await Promise.all(
+            failures.map(failure => Failure.create({
+                ...failure,
+                medicalRecordId: newMedicalRecord.id
+            }, { transaction }))
+        );
+
+        await transaction.commit();
+        res.status(201).json({
+            medicalRecord: newMedicalRecord,
+            failures: createdFailures
+        });
+    } catch (error) {
+        await transaction.rollback();
+        res.status(500).json({ error: error.message });
+    }
 }; 

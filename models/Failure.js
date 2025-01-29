@@ -155,11 +155,6 @@ Failure.associate = (models) => {
     as: 'professional'
   });
 
-  Failure.belongsTo(models.Professional, {
-    foreignKey: 'auditorId',
-    as: 'auditor'
-  });
-
   Failure.belongsTo(models.Patient, {
     foreignKey: 'patientId',
     as: 'patient'
@@ -180,21 +175,16 @@ Failure.associate = (models) => {
     as: 'hospital'
   });
 
-  Failure.belongsTo(models.Sector, {
-    foreignKey: 'sectorId',
-    as: 'sector'
-  });
-
   Failure.belongsTo(models.Form, {
     foreignKey: 'formId',
     as: 'form'
   });
 
-  Failure.belongsToMany(models.TPInconsistencies, {
-    through: 'failure_tp_inconsistencies',
-    foreignKey: 'failureId',
-    otherKey: 'tpInconsistencyId',
-    as: 'tpInconsistencies'
+  Failure.belongsToMany(models.InconsistencyType, {
+    through: 'failure_inconsistency_types',
+    foreignKey: 'failureId', 
+    otherKey: 'inconsistencyTypeId',
+    as: 'inconsistencyTypes'
   });
 };
 
