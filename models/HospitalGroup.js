@@ -40,9 +40,4 @@ const HospitalGroup = sequelize.define('HospitalGroup', {
   underscored: true
 });
 
-HospitalGroup.hasMany(HospitalSubGroup, {
-  foreignKey: 'groupId',
-  as: 'subGroups'
-});
-
 module.exports = HospitalGroup;
