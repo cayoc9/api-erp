@@ -1,23 +1,19 @@
 // models/HospitalGroup.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
+const HospitalSubGroup = require('./HospitalSubGroup');
 
 const HospitalGroup = sequelize.define('HospitalGroup', {
   id: {
     type: DataTypes.INTEGER, // CD_GRUPO_HOSPITAL
     primaryKey: true,
-    autoIncrement: true, // Se `CD_GRUPO_HOSPITAL` é auto-increment
+    autoIncrement: true,
   },
-  description: { // DS_GRUPO
+  description: {
     type: DataTypes.STRING(20),
     allowNull: false,
   },
-  subGroup: {
-    type: DataTypes.STRING(50),
-    allowNull: true,
-    field: 'sub_group'
-  },
-  createDate: { // CREATE_DATE
+  createDate: {
     type: DataTypes.DATE,
     allowNull: true,
     defaultValue: DataTypes.NOW,
@@ -42,6 +38,11 @@ const HospitalGroup = sequelize.define('HospitalGroup', {
   tableName: 'hospital_groups',
   timestamps: false,
   underscored: true
+});
+
+HospitalGroup.hasMany(HospitalSubGroup, {
+  foreignKey: 'groupId',
+  as: 'subGroups'
 });
 
 module.exports = HospitalGroup;

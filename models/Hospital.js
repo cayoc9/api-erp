@@ -29,6 +29,14 @@ Hospital.init(
       allowNull: false,
       defaultValue: '',
     },
+    subGroupId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'hospital_subgroups',
+        key: 'id',
+      },
+    },
   },
   {
     tableName: 'hospitals',

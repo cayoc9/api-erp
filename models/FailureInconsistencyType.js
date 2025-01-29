@@ -1,4 +1,4 @@
-const { sequelize } = require('../config/database');
+const sequelize = require('../config/database');
 const { DataTypes } = require('sequelize');
 
 const FailureInconsistencyType = sequelize.define('FailureInconsistencyType', {

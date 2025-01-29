@@ -15,6 +15,7 @@ const HospitalGroup = require('./HospitalGroup');
 const Patient = require('./Patient');
 const Internment = require('./Internment');
 const MedicalRecord = require('./MedicalRecord');
+const HospitalSubGroup = require('./HospitalSubGroup');
 
 // Definição das associações
 
@@ -102,6 +103,7 @@ Failure.belongsTo(Hospital, {
 // Definir ordem de sincronização
 const models = {
   HospitalGroup,
+  HospitalSubGroup,
   Hospital,
   Sector,
   Professional,
