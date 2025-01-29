@@ -1,9 +1,9 @@
 // models/Hospital.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
-const BaseModel = require('./BaseModel');
+const ModeloBase = require('./ModeloBase');
 
-class Hospital extends BaseModel { }
+class Hospital extends ModeloBase { }
 
 Hospital.init(
   {
@@ -11,72 +11,78 @@ Hospital.init(
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
+      comment: 'ID único do hospital'
     },
-    name: {
+    nome: {
       type: DataTypes.STRING(60),
       allowNull: false,
+      comment: 'Nome oficial do hospital'
     },
-    groupId: {
+    grupoId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'hospital_groups',
+        model: 'grupos_hospitares',
         key: 'id',
       },
+      comment: 'ID do grupo hospitalar'
     },
-    state: {
+    uf: {
       type: DataTypes.STRING(2),
       allowNull: false,
-      defaultValue: '',
-      comment: 'Sigla do estado (2 caracteres)'
+      comment: 'Unidade Federativa (sigla)'
     },
-    city: {
+    municipio: {
       type: DataTypes.STRING(60),
       allowNull: false,
-      defaultValue: '',
+      comment: 'Nome do município sede'
     },
-    cnesCode: {
+    codigoCnes: {
       type: DataTypes.STRING(7),
       allowNull: false,
       unique: true,
-      comment: 'Código CNES (7 dígitos)'
+      comment: 'Código CNES oficial'
     },
-    platformAccessCode: {
+    codigoAcessoPlataforma: {
       type: DataTypes.STRING(20),
       allowNull: true,
+      comment: 'Código de acesso à plataforma integrada'
     },
-    hospitalType: {
+    tipoHospital: {
       type: DataTypes.STRING(20),
       allowNull: false,
-      comment: 'Tipo de instituição hospitalar'
+      comment: 'Classificação do tipo de hospital'
     },
-    acronym: {
+    sigla: {
       type: DataTypes.STRING(10),
       allowNull: true,
+      comment: 'Sigla institucional'
     },
     cnpj: {
       type: DataTypes.STRING(14),
       allowNull: false,
       unique: true,
-      comment: 'CNPJ sem formatação (14 dígitos)'
+      comment: 'CNPJ sem formatação'
     },
-    address: {
+    endereco: {
       type: DataTypes.STRING(255),
       allowNull: false,
-      defaultValue: '',
+      comment: 'Endereço completo'
     },
-    subGroupId: {
+    subgrupoId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'hospital_subgroups',
+        model: 'subgrupos_hospitares',
         key: 'id',
       },
+      comment: 'ID do subgrupo de gestão'
     },
   },
   {
-    tableName: 'hospitals',
+    tableName: 'hospitais',
     sequelize,
+    comment: 'Tabela de hospitais cadastrados no sistema'
   }
 );
 

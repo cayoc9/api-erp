@@ -6,7 +6,7 @@
 
 const express = require('express');
 const router = express.Router();
-const InconsistencyTypeController = require('../controllers/InconsistencyTypeController');
+const controladorTipoInconsistencia = require('../controllers/TipoInconsistenciaController');
 
 /**
  * @swagger
@@ -31,10 +31,17 @@ const InconsistencyTypeController = require('../controllers/InconsistencyTypeCon
 
 /**
  * @swagger
+ * tags:
+ *   name: Tipos de Inconsistência
+ *   description: Gestão de tipos de inconsistências
+ */
+
+/**
+ * @swagger
  * /api/tp-inconsistencies:
  *   get:
  *     summary: Lista todos os tipos de inconsistência
- *     tags: [Inconsistency Types]
+ *     tags: [Tipos de Inconsistência]
  *     responses:
  *       200:
  *         description: Lista de tipos de inconsistência
@@ -47,7 +54,7 @@ const InconsistencyTypeController = require('../controllers/InconsistencyTypeCon
  * 
  *   post:
  *     summary: Cria novo tipo de inconsistência
- *     tags: [Inconsistency Types]
+ *     tags: [Tipos de Inconsistência]
  *     requestBody:
  *       required: true
  *       content:
@@ -62,18 +69,18 @@ const InconsistencyTypeController = require('../controllers/InconsistencyTypeCon
  */
 
 // GET /api/tp-inconsistencies - Lista todas as inconsistências
-router.get('/', InconsistencyTypeController.getAllInconsistencyTypes);
+router.get('/', controladorTipoInconsistencia.obterTodosTipos);
 
 // GET /api/tp-inconsistencies/:id - Detalhes de uma inconsistência
-router.get('/:id', InconsistencyTypeController.getInconsistencyTypeById);
+router.get('/:id', controladorTipoInconsistencia.obterTipoPorId);
 
 // POST /api/tp-inconsistencies - Cria uma inconsistência
-router.post('/', InconsistencyTypeController.createInconsistencyType);
+router.post('/', controladorTipoInconsistencia.criarTipo);
 
 // PUT /api/tp-inconsistencies/:id - Atualiza uma inconsistência
-router.put('/:id', InconsistencyTypeController.updateInconsistencyType);
+router.put('/:id', controladorTipoInconsistencia.atualizarTipo);
 
 // DELETE /api/tp-inconsistencies/:id - Remove uma inconsistência
-router.delete('/:id', InconsistencyTypeController.deleteInconsistencyType);
+router.delete('/:id', controladorTipoInconsistencia.deletarTipo);
 
 module.exports = router;

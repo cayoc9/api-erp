@@ -1,21 +1,21 @@
-// routes/sectors.js
+// routes/setores.js
 const express = require('express');
 const router = express.Router();
-const sectorController = require('../controllers/SectorController.js');
+const controladorSetor = require('../controllers/SetorController');
 
 /**
  * @swagger
  * tags:
- *   name: Sectors
+ *   name: Setores
  *   description: Gestão de setores hospitalares
  */
 
 /**
  * @swagger
- * /api/sectors:
+ * /api/setores:
  *   get:
  *     summary: Lista todos os setores
- *     tags: [Sectors]
+ *     tags: [Setores]
  *     responses:
  *       200:
  *         description: Lista de setores
@@ -30,7 +30,7 @@ const sectorController = require('../controllers/SectorController.js');
  * 
  *   post:
  *     summary: Cria novo setor
- *     tags: [Sectors]
+ *     tags: [Setores]
  *     requestBody:
  *       required: true
  *       content:
@@ -48,10 +48,10 @@ const sectorController = require('../controllers/SectorController.js');
 
 /**
  * @swagger
- * /api/sectors/{id}:
+ * /api/setores/{id}:
  *   get:
  *     summary: Obtém setor por ID
- *     tags: [Sectors]
+ *     tags: [Setores]
  *     parameters:
  *       - in: path
  *         name: id
@@ -68,7 +68,7 @@ const sectorController = require('../controllers/SectorController.js');
  * 
  *   put:
  *     summary: Atualiza setor existente
- *     tags: [Sectors]
+ *     tags: [Setores]
  *     parameters:
  *       - in: path
  *         name: id
@@ -91,7 +91,7 @@ const sectorController = require('../controllers/SectorController.js');
  * 
  *   delete:
  *     summary: Remove setor
- *     tags: [Sectors]
+ *     tags: [Setores]
  *     parameters:
  *       - in: path
  *         name: id
@@ -108,18 +108,18 @@ const sectorController = require('../controllers/SectorController.js');
  */
 
 // Rota para obter todos os setores
-router.get('/', sectorController.getAllSectors);
+router.get('/', controladorSetor.obterTodosSetores);
 
 // Rota para obter um setor por ID
-router.get('/:id', sectorController.getSectorById);
+router.get('/:id', controladorSetor.obterSetorPorId);
 
 // Rota para criar um novo setor
-router.post('/', sectorController.createSector);
+router.post('/', controladorSetor.criarSetor);
 
 // Rota para atualizar um setor existente
-router.put('/:id', sectorController.updateSector);
+router.put('/:id', controladorSetor.atualizarSetor);
 
 // Rota para deletar um setor
-router.delete('/:id', sectorController.deleteSector);
+router.delete('/:id', controladorSetor.deletarSetor);
 
 module.exports = router;

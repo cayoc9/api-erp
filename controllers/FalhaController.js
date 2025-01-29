@@ -1,83 +1,86 @@
-// controllers/failureController.js
+// controllers/FalhaController.js
 const {
-  Failure,
-  Form,
-  InconsistencyType,
+  Falha,
+  Formulario,
+  TipoInconsistencia,
   Hospital,
-  Sector,
+  Setor,
   sequelize
 } = require('../models');
 
 // Obter todas as falhas
-exports.getAllFailures = async (req, res) => {
+exports.obterTodasFalhas = async (req, res) => {
   try {
     console.log('Iniciando busca de falhas...');
 
-    const failures = await Failure.findAll({
+    const falhas = await Falha.findAll({
       include: [
         {
           model: Hospital,
           as: 'hospital',
-          attributes: ['id', 'name']
+          attributes: ['id', 'nome']
         },
         {
-          model: Sector,
-          as: 'sector',
-          attributes: ['id', 'name']
+          model: Setor,
+          as: 'setor',
+          attributes: ['id', 'nome']
         },
         {
-          model: InconsistencyType,
-          as: 'inconsistencyTypes',
+          model: TipoInconsistencia,
+          as: 'tiposInconsistencia',
           through: { attributes: [] }
         }
       ],
       attributes: [
         'id',
-        'medicalRecordCode',
+        'codigoProntuario',
         'status',
-        'createdAt',
-        'updatedAt'
+        'dataCriacao',
+        'dataAtualizacao'
       ],
       raw: false,
       nest: true
     });
 
-    console.log('Dados brutos:', failures);
+    console.log('Dados brutos:', falhas);
     res.json({
-      status: 'success',
-      data: failures
+      status: 'sucesso',
+      dados: falhas
     });
 
-  } catch (error) {
-    console.error('Erro detalhado:', error);
+  } catch (erro) {
+    console.error('Erro:', erro);
     res.status(500).json({
-      status: 'error',
-      message: 'Erro ao buscar falhas',
-      error: error.message
+      status: 'erro',
+      mensagem: 'Erro ao buscar falhas',
+      erro: erro.message
     });
   }
 };
 
 // Obter uma falha por ID
-exports.getFailureById = async (req, res) => {
+exports.obterFalhaPorId = async (req, res) => {
   const { id } = req.params;
   try {
-    const failure = await Failure.findByPk(id, {
+    const falha = await Falha.findByPk(id, {
       include: [
-        { model: Form, as: 'formulario' },
-        { model: InconsistencyType, as: 'inconsistencyTypes', through: { attributes: [] } },
+        { model: Formulario, as: 'formulario' },
+        { model: TipoInconsistencia, as: 'tiposInconsistencia' },
         { model: Hospital, as: 'hospital' },
-        { model: Sector, as: 'sector' }
+        { model: Setor, as: 'setor' }
       ],
     });
-    if (failure) {
-      res.status(200).json(failure);
+    if (falha) {
+      res.status(200).json(falha);
     } else {
-      res.status(404).json({ message: 'Falha não encontrada.' });
+      res.status(404).json({ mensagem: 'Falha não encontrada.' });
     }
-  } catch (error) {
-    console.error('Erro ao obter a falha:', error);
-    res.status(500).json({ message: 'Erro ao obter a falha.', error });
+  } catch (erro) {
+    console.error('Erro ao obter a falha:', erro);
+    res.status(500).json({
+      mensagem: 'Erro ao obter falha.',
+      erro: erro.message
+    });
   }
 };
 
@@ -136,7 +139,7 @@ exports.createFailure = async (req, res) => {
     }
 
     // Criar a falha com status padrão
-    const newFailure = await Failure.create({
+    const newFailure = await Falha.create({
       medicalRecordCode,
       formId,
       formularioDate: formularioDate || new Date(),
@@ -155,12 +158,12 @@ exports.createFailure = async (req, res) => {
     await transaction.commit();
 
     // Retornar com associações
-    const createdFailure = await Failure.findByPk(newFailure.id, {
+    const createdFailure = await Falha.findByPk(newFailure.id, {
       include: [
-        { model: Form, as: 'formulario' },
-        { model: InconsistencyType, as: 'inconsistencyType' },
+        { model: Formulario, as: 'formulario' },
+        { model: TipoInconsistencia, as: 'inconsistencyType' },
         { model: Hospital, as: 'hospital' },
-        { model: Sector, as: 'sector' }
+        { model: Setor, as: 'sector' }
       ]
     });
 
@@ -182,7 +185,7 @@ exports.updateFailure = async (req, res) => {
   const transaction = await sequelize.transaction();
 
   try {
-    const failure = await Failure.findByPk(id, { transaction });
+    const failure = await Falha.findByPk(id, { transaction });
     if (!failure) {
       return res.status(404).json({ message: 'Falha não encontrada.' });
     }
@@ -208,12 +211,12 @@ exports.updateFailure = async (req, res) => {
     await transaction.commit();
 
     // Recarregar a falha com as associações atualizadas
-    const updatedFailure = await Failure.findByPk(id, {
+    const updatedFailure = await Falha.findByPk(id, {
       include: [
-        { model: Form, as: 'formulario' },
-        { model: InconsistencyType, as: 'inconsistencyType' },
+        { model: Formulario, as: 'formulario' },
+        { model: TipoInconsistencia, as: 'inconsistencyType' },
         { model: Hospital, as: 'hospital' },
-        { model: Sector, as: 'sector' }
+        { model: Setor, as: 'sector' }
       ],
     });
 
@@ -230,7 +233,7 @@ exports.updateFailure = async (req, res) => {
 exports.deleteFailure = async (req, res) => {
   const { id } = req.params;
   try {
-    const failure = await Failure.findByPk(id);
+    const failure = await Falha.findByPk(id);
     if (failure) {
       await failure.destroy();
       res.status(200).json({ message: 'Falha deletada com sucesso.' });

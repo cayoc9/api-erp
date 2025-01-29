@@ -4,33 +4,34 @@ const express = require('express');
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
-const { sequelize, syncModels } = require('./models'); // Importa a instância do Sequelize e os modelos
+const { sequelize, sincronizarModelos } = require('./models');
 
 // Importar rotas
-const sectorRoutes = require('./routes/sectors');
-const professionalRoutes = require('./routes/professionals');
-const failureRoutes = require('./routes/failures');
-const indicatorRoutes = require('./routes/indicators');
-const hospitalRoutes = require('./routes/hospitals');
-const formRoutes = require('./routes/forms'); // Rota de forms
-const inconsistencyTypeRoutes = require('./routes/inconsistency-types');
-const hospitalGroupRoutes = require('./routes/hospital-groups'); // Rota de hospital-groups
-const statisticsRoutes = require('./routes/statistics'); // Rota de statistics
-const patientRoutes = require('./routes/patients');
-const internmentRoutes = require('./routes/internments');
-const medicalRecordRoutes = require('./routes/medical-records');
+const rotasSetor = require('./routes/setores');
+const rotasProfissional = require('./routes/profissionais');
+const rotasFalha = require('./routes/falhas');
+const rotasIndicador = require('./routes/indicadores');
+const rotasHospital = require('./routes/hospitais');
+const rotasFormulario = require('./routes/formularios');
+const rotasTipoInconsistencia = require('./routes/tipos-inconsistencia');
+const rotasGrupoHospitalar = require('./routes/grupos-hospitares');
+const rotasEstatistica = require('./routes/estatisticas');
+const rotasPaciente = require('./routes/pacientes');
+const rotasInternacao = require('./routes/internacoes');
+const rotasProntuario = require('./routes/prontuarios');
 
 // Importar middlewares
-const authMiddleware = require('./middlewares/auth');
-const requestLogger = require('./middlewares/requestLogger');
-const rateLimiter = require('./middlewares/rateLimiter');
+const autenticacao = require('./middlewares/autenticacao');
+const registroRequisicao = require('./middlewares/registroRequisicao');
+const limitadorRequisicao = require('./middlewares/limitadorRequisicao');
+const rastreamento = require('./middlewares/rastreamento');
+const paginacao = require('./middlewares/paginacao');
 
 const app = express();
-// habilitar o proxy
 app.set('trust proxy', 1);
 
 // Configurar opções do Swagger
-const swaggerOptions = {
+const opcoesSwagger = {
   definition: {
     openapi: '3.0.0',
     info: {
@@ -58,13 +59,13 @@ const swaggerOptions = {
       }
     }
   },
-  apis: ['./routes/*.js'], // Caminho para os arquivos de rota
+  apis: ['./routes/*.js'],
 };
 
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
+const especificacaoSwagger = swaggerJsdoc(opcoesSwagger);
 
-// Error Handler
-const { errorHandler } = require('./utils/errorHandler');
+// Tratamento de Erros
+const { tratadorErros } = require('./utils/tratadorErros');
 
 // Middlewares
 app.use(cors({
@@ -78,73 +79,52 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
+
 app.use(express.json());
-
-// Adicionar middleware de log
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-  next();
-});
-
-app.use('/api/forms/with-failures', (req, res, next) => {
-  if (req.method === 'POST') {
-    console.log('Payload recebido em /forms/with-failures:', req.body);
-  }
-  next();
-});
-
-// Aplicar middlewares globais
-app.use(requestLogger);
-app.use(rateLimiter);
-
-// Rotas públicas
-app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-
-// Middleware de autenticação para rotas protegidas
-// app.use('/api', authMiddleware);
+app.use(registroRequisicao);
+app.use(limitadorRequisicao);
+app.use(rastreamento);
+app.use(paginacao);
 
 // Rotas
-app.use('/api/professionals', professionalRoutes);
-app.use('/api/forms', formRoutes);
-app.use('/api/inconsistency-types', inconsistencyTypeRoutes);
-app.use('/api/sectors', sectorRoutes);
-app.use('/api/failures', failureRoutes);
-app.use('/api/indicators', indicatorRoutes);
-app.use('/api/hospitals', hospitalRoutes);
-app.use('/api/hospital-groups', hospitalGroupRoutes);
-app.use('/api/statistics', statisticsRoutes);
-app.use('/api/patients', patientRoutes);
-app.use('/api/internments', internmentRoutes);
-app.use('/api/medical-records', medicalRecordRoutes);
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(especificacaoSwagger));
+app.use('/api/setores', rotasSetor);
+app.use('/api/profissionais', rotasProfissional);
+app.use('/api/falhas', rotasFalha);
+app.use('/api/indicadores', rotasIndicador);
+app.use('/api/hospitais', rotasHospital);
+app.use('/api/formularios', rotasFormulario);
+app.use('/api/tipos-inconsistencia', rotasTipoInconsistencia);
+app.use('/api/grupos-hospitares', rotasGrupoHospitalar);
+app.use('/api/estatisticas', rotasEstatistica);
+app.use('/api/pacientes', rotasPaciente);
+app.use('/api/internacoes', rotasInternacao);
+app.use('/api/prontuarios', rotasProntuario);
 
-// Global error handling middleware
-app.use(errorHandler);
-const PORT = process.env.PORT || 5000;
+// Middleware global de tratamento de erros
+app.use(tratadorErros);
 
-/**
- * Primeiro, testamos a conexão com o banco.
- * Em seguida, sincronizamos modelos sem recriar tabelas.
- * Por fim, iniciamos o servidor.
- */
+const PORTA = process.env.PORT || 5000;
+
+// Inicialização do servidor
 sequelize.authenticate()
   .then(async () => {
-    console.log('Connected to the database...');
+    console.log('Conectado ao banco de dados...');
     try {
-      // Forçar recriação do banco em todos os ambientes
       console.log('Recriando estrutura do banco...');
       await sequelize.sync({ force: true });
+      console.log('Modelos sincronizados com o banco de dados.');
 
-      console.log('Models synchronized with the database.');
-      app.listen(PORT, '0.0.0.0', () => {
-        console.log(`Server running on port ${PORT}`);
-        console.log(`Documentação disponível em: http://localhost:${PORT}/docs`);
+      app.listen(PORTA, '0.0.0.0', () => {
+        console.log(`Servidor rodando na porta ${PORTA}`);
+        console.log(`Documentação disponível em: http://localhost:${PORTA}/docs`);
       });
-    } catch (error) {
-      console.error('Error synchronizing models:', error);
+    } catch (erro) {
+      console.error('Erro ao sincronizar modelos:', erro);
       process.exit(1);
     }
   })
-  .catch(err => {
-    console.error('Error connecting to database:', err);
+  .catch(erro => {
+    console.error('Erro ao conectar ao banco de dados:', erro);
     process.exit(1);
   });

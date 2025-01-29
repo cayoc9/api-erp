@@ -313,4 +313,47 @@ exports.createMedicalRecordWithFailures = async (req, res) => {
         await transaction.rollback();
         res.status(500).json({ error: error.message });
     }
+};
+
+exports.obterTodosProntuarios = async (req, res) => {
+    try {
+        const prontuarios = await MedicalRecord.findAll({
+            include: [
+                { model: Patient, as: 'patient' },
+                { model: Sector, as: 'dischargeSector' }
+            ]
+        });
+        res.status(200).json(prontuarios);
+    } catch (erro) {
+        res.status(500).json({
+            mensagem: 'Erro ao buscar prontuários',
+            erro: erro.message
+        });
+    }
+};
+
+exports.criarProntuario = async (req, res) => {
+    const {
+        codigoProntuario,
+        pacienteId,
+        hospitalId,
+        dataEntrada,
+        usuarioCriacao
+    } = req.body;
+
+    try {
+        const novoProntuario = await MedicalRecord.create({
+            codigoProntuario,
+            pacienteId,
+            hospitalId,
+            dataEntrada,
+            usuarioCriacao
+        });
+        res.status(201).json(novoProntuario);
+    } catch (erro) {
+        res.status(500).json({
+            mensagem: 'Erro ao criar prontuário',
+            erro: erro.message
+        });
+    }
 }; 

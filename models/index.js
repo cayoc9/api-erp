@@ -4,212 +4,212 @@ const sequelize = require('../config/database');
 
 // Importação dos modelos
 const Hospital = require('./Hospital');
-const Sector = require('./Sector');
-const Professional = require('./Professional');
-const Failure = require('./Failure');
-const Form = require('./Form');
-const Indicator = require('./Indicator');
-const HospitalGroup = require('./HospitalGroup');
-const Patient = require('./Patient');
-const Internment = require('./Internment');
-const MedicalRecord = require('./MedicalRecord');
-const HospitalSubGroup = require('./HospitalSubGroup');
-const InconsistencyType = require('./InconsistencyType.js');
+const Setor = require('./Setor');
+const Profissional = require('./Profissional');
+const Falha = require('./Falha');
+const Formulario = require('./Formulario');
+const Indicador = require('./Indicador');
+const GrupoHospitalar = require('./GrupoHospitalar');
+const Paciente = require('./Paciente');
+const Internacao = require('./Internacao');
+const Prontuario = require('./Prontuario');
+const SubgrupoHospitalar = require('./SubgrupoHospitalar');
+const TipoInconsistencia = require('./TipoInconsistencia');
 
 // ======================
-// 1. Associações do HospitalGroup
+// 1. Associações do GrupoHospitalar
 // ======================
-HospitalGroup.hasMany(HospitalSubGroup, {
-  foreignKey: 'groupId',
-  as: 'subGroups'
+GrupoHospitalar.hasMany(SubgrupoHospitalar, {
+  foreignKey: 'grupoId',
+  as: 'subgrupos'
 });
 
-HospitalSubGroup.belongsTo(HospitalGroup, {
-  foreignKey: 'groupId',
-  as: 'hospitalGroup'
+SubgrupoHospitalar.belongsTo(GrupoHospitalar, {
+  foreignKey: 'grupoId',
+  as: 'grupoHospitalar'
 });
 
 // ======================
-// 2. Associações do HospitalSubGroup
+// 2. Associações do SubgrupoHospitalar
 // ======================
-HospitalSubGroup.hasMany(Hospital, {
-  foreignKey: 'subGroupId',
-  as: 'hospitals'
+SubgrupoHospitalar.hasMany(Hospital, {
+  foreignKey: 'subgrupoId',
+  as: 'hospitais'
 });
 
-Hospital.belongsTo(HospitalSubGroup, {
-  foreignKey: 'subGroupId',
-  as: 'hospitalSubGroup'
+Hospital.belongsTo(SubgrupoHospitalar, {
+  foreignKey: 'subgrupoId',
+  as: 'subgrupoHospitalar'
 });
 
 // ======================
 // 3. Associações do Hospital
 // ======================
-Hospital.hasMany(Sector, {
+Hospital.hasMany(Setor, {
   foreignKey: 'hospitalId',
-  as: 'sectors'
+  as: 'setores'
 });
 
-Hospital.hasMany(Failure, {
+Hospital.hasMany(Falha, {
   foreignKey: 'hospitalId',
-  as: 'failures'
+  as: 'falhas'
 });
 
 // ======================
-// 4. Associações do Sector
+// 4. Associações do Setor
 // ======================
-Sector.belongsTo(Hospital, {
-  foreignKey: 'hospitalId',
-  as: 'hospital'
-});
-
-Sector.hasMany(Failure, {
-  foreignKey: 'sectorId',
-  as: 'failures'
-});
-
-// ======================
-// 5. Associações do Professional
-// ======================
-Professional.hasMany(Failure, {
-  foreignKey: 'professionalId',
-  as: 'failures'
-});
-
-Professional.hasMany(Failure, {
-  foreignKey: 'auditorId',
-  as: 'audits'
-});
-
-// ======================
-// 6. Associações do Patient
-// ======================
-Patient.hasMany(Internment, {
-  foreignKey: 'patientId',
-  as: 'internments'
-});
-
-Patient.hasMany(MedicalRecord, {
-  foreignKey: 'patientId',
-  as: 'medicalRecords'
-});
-
-// ======================
-// 7. Associações do Internment
-// ======================
-Internment.belongsTo(Patient, {
-  foreignKey: 'patientId',
-  as: 'patient'
-});
-
-Internment.belongsTo(Sector, {
-  foreignKey: 'dischargeSectorId',
-  as: 'dischargeSector'
-});
-
-Internment.hasMany(Failure, {
-  foreignKey: 'internmentId',
-  as: 'failures'
-});
-
-// ======================
-// 8. Associações do MedicalRecord
-// ======================
-MedicalRecord.belongsTo(Professional, {
-  foreignKey: 'auditorId',
-  as: 'auditor'
-});
-
-MedicalRecord.belongsTo(Sector, {
-  foreignKey: 'auditorSectorId',
-  as: 'auditorSector'
-});
-
-MedicalRecord.belongsTo(Patient, {
-  foreignKey: 'patientId',
-  as: 'patient'
-});
-
-MedicalRecord.belongsTo(Sector, {
-  foreignKey: 'dischargeSectorId',
-  as: 'dischargeSector'
-});
-
-MedicalRecord.hasMany(Failure, {
-  foreignKey: 'medicalRecordId',
-  as: 'failures'
-});
-
-// ======================
-// 9. Associações do Failure
-// ======================
-Failure.belongsTo(Professional, {
-  foreignKey: 'professionalId',
-  as: 'professional'
-});
-
-Failure.belongsTo(Professional, {
-  foreignKey: 'auditorId',
-  as: 'auditor'
-});
-
-Failure.belongsTo(Form, {
-  foreignKey: 'formId',
-  as: 'form'
-});
-
-Failure.belongsTo(MedicalRecord, {
-  foreignKey: 'medicalRecordId',
-  as: 'medicalRecord'
-});
-
-Failure.belongsTo(Sector, {
-  foreignKey: 'sectorReporterId',
-  as: 'sectorReporter'
-});
-
-Failure.belongsTo(Sector, {
-  foreignKey: 'sectorResponsibleId',
-  as: 'sectorResponsible'
-});
-
-Failure.belongsTo(Hospital, {
+Setor.belongsTo(Hospital, {
   foreignKey: 'hospitalId',
   as: 'hospital'
 });
 
-// ======================
-// 10. Associações Atualizadas
-// ======================
-Failure.belongsTo(InconsistencyType, {
-  foreignKey: 'inconsistencyTypeId',
-  as: 'inconsistencyType'
+Setor.hasMany(Falha, {
+  foreignKey: 'setorId',
+  as: 'falhas'
 });
 
-InconsistencyType.hasMany(Failure, {
-  foreignKey: 'inconsistencyTypeId',
-  as: 'failures'
+// ======================
+// 5. Associações do Profissional
+// ======================
+Profissional.hasMany(Falha, {
+  foreignKey: 'profissionalId',
+  as: 'falhas'
+});
+
+Profissional.hasMany(Falha, {
+  foreignKey: 'auditorId',
+  as: 'auditorias'
+});
+
+// ======================
+// 6. Associações do Paciente
+// ======================
+Paciente.hasMany(Internacao, {
+  foreignKey: 'pacienteId',
+  as: 'internacoes'
+});
+
+Paciente.hasMany(Prontuario, {
+  foreignKey: 'pacienteId',
+  as: 'prontuarios'
+});
+
+// ======================
+// 7. Associações da Internação
+// ======================
+Internacao.belongsTo(Paciente, {
+  foreignKey: 'pacienteId',
+  as: 'paciente'
+});
+
+Internacao.belongsTo(Setor, {
+  foreignKey: 'setorAltaId',
+  as: 'setorAlta'
+});
+
+Internacao.hasMany(Falha, {
+  foreignKey: 'internacaoId',
+  as: 'falhas'
+});
+
+// ======================
+// 8. Associações do Prontuário
+// ======================
+Prontuario.belongsTo(Profissional, {
+  foreignKey: 'auditorId',
+  as: 'auditor'
+});
+
+Prontuario.belongsTo(Setor, {
+  foreignKey: 'setorAuditorId',
+  as: 'setorAuditor'
+});
+
+Prontuario.belongsTo(Paciente, {
+  foreignKey: 'pacienteId',
+  as: 'paciente'
+});
+
+Prontuario.belongsTo(Setor, {
+  foreignKey: 'setorAltaId',
+  as: 'setorAlta'
+});
+
+Prontuario.hasMany(Falha, {
+  foreignKey: 'prontuarioId',
+  as: 'falhas'
+});
+
+// ======================
+// 9. Associações da Falha
+// ======================
+Falha.belongsTo(Profissional, {
+  foreignKey: 'profissionalId',
+  as: 'profissional'
+});
+
+Falha.belongsTo(Profissional, {
+  foreignKey: 'auditorId',
+  as: 'auditor'
+});
+
+Falha.belongsTo(Formulario, {
+  foreignKey: 'formularioId',
+  as: 'formulario'
+});
+
+Falha.belongsTo(Prontuario, {
+  foreignKey: 'prontuarioId',
+  as: 'prontuario'
+});
+
+Falha.belongsTo(Setor, {
+  foreignKey: 'setorRelatorId',
+  as: 'setorRelator'
+});
+
+Falha.belongsTo(Setor, {
+  foreignKey: 'setorResponsavelId',
+  as: 'setorResponsavel'
+});
+
+Falha.belongsTo(Hospital, {
+  foreignKey: 'hospitalId',
+  as: 'hospital'
+});
+
+// ======================
+// 10. Associações do TipoInconsistencia
+// ======================
+Falha.belongsTo(TipoInconsistencia, {
+  foreignKey: 'tipoInconsistenciaId',
+  as: 'tipoInconsistencia'
+});
+
+TipoInconsistencia.hasMany(Falha, {
+  foreignKey: 'tipoInconsistenciaId',
+  as: 'falhas'
 });
 
 // Definir ordem de sincronização
-const models = {
-  HospitalGroup,
-  HospitalSubGroup,
+const modelos = {
+  GrupoHospitalar,
+  SubgrupoHospitalar,
   Hospital,
-  Sector,
-  Professional,
-  Patient,
-  MedicalRecord,
-  Internment,
-  Form,
-  InconsistencyType,
-  Failure,
+  Setor,
+  Profissional,
+  Paciente,
+  Prontuario,
+  Internacao,
+  Formulario,
+  TipoInconsistencia,
+  Falha,
 };
 
 // Sincronizar modelos em ordem
-const syncModels = async () => {
-  for (const modelName of Object.keys(models)) {
-    await models[modelName].sync();
+const sincronizarModelos = async () => {
+  for (const nomeModelo of Object.keys(modelos)) {
+    await modelos[nomeModelo].sync();
   }
 };
 
@@ -217,6 +217,6 @@ const syncModels = async () => {
 module.exports = {
   sequelize,
   Sequelize,
-  ...models,
-  syncModels
+  ...modelos,
+  sincronizarModelos
 };

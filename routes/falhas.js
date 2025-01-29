@@ -1,36 +1,30 @@
-// routes/failures.js
+// routes/falhas.js
 const express = require('express');
 const router = express.Router();
-const failureController = require('../controllers/FailureController');
+const controladorFalha = require('../controllers/FalhaController');
 
 /**
  * @swagger
  * tags:
- *   name: Failures
+ *   name: Falhas
  *   description: Gestão de falhas e inconsistências
  */
 
 /**
  * @swagger
- * /api/failures:
+ * /api/falhas:
  *   get:
- *     summary: Lista falhas com relacionamentos
- *     tags: [Failures]
+ *     summary: Lista todas as falhas
+ *     tags: [Falhas]
  *     responses:
  *       200:
- *         description: Lista de falhas
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Failure'
+ *         description: Lista de falhas obtida com sucesso
  *       500:
- *         $ref: '#/components/responses/ServerError'
+ *         $ref: '#/components/responses/ErroServidor'
  * 
  *   post:
  *     summary: Cria nova falha
- *     tags: [Failures]
+ *     tags: [Falhas]
  *     requestBody:
  *       required: true
  *       content:
@@ -47,18 +41,18 @@ const failureController = require('../controllers/FailureController');
  */
 
 // Rota para obter todas as falhas
-router.get('/', failureController.getAllFailures);
+router.get('/', controladorFalha.obterTodasFalhas);
 
 // Rota para obter uma falha por ID
-router.get('/:id', failureController.getFailureById);
+router.get('/:id', controladorFalha.obterFalhaPorId);
 
 // Rota para criar uma nova falha
-router.post('/', failureController.createFailure);
+router.post('/', controladorFalha.criarFalha);
 
 // Rota para atualizar uma falha existente
-router.put('/:id', failureController.updateFailure);
+router.put('/:id', controladorFalha.atualizarFalha);
 
 // Rota para deletar uma falha
-router.delete('/:id', failureController.deleteFailure);
+router.delete('/:id', controladorFalha.deletarFalha);
 
 module.exports = router;

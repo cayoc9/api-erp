@@ -1,81 +1,152 @@
-// controllers/hospitalController.js
-const { Hospital, HospitalGroup, Sector } = require('../models');
+// controllers/HospitalController.js
+const { Hospital, GrupoHospitalar, Setor } = require('../models');
 
 // Obter todos os hospitais
-exports.getAllHospitals = async (req, res) => {
+exports.obterTodosHospitais = async (req, res) => {
   try {
-    const hospitals = await Hospital.findAll({
+    const hospitais = await Hospital.findAll({
       include: [
-        { model: HospitalGroup, as: 'hospitalGroup' },
-        { model: Sector, as: 'sectors' }
+        { model: GrupoHospitalar, as: 'grupoHospitalar' },
+        { model: Setor, as: 'setores' }
       ],
     });
-    res.status(200).json(hospitals);
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao obter os hospitais.', error });
+    res.status(200).json(hospitais);
+  } catch (erro) {
+    res.status(500).json({
+      mensagem: 'Erro ao obter os hospitais',
+      erro: erro.message
+    });
   }
 };
 
 // Obter um hospital por ID
-exports.getHospitalById = async (req, res) => {
+exports.obterHospitalPorId = async (req, res) => {
   const { id } = req.params;
   try {
     const hospital = await Hospital.findByPk(id, {
       include: [
-        { model: HospitalGroup, as: 'hospitalGroup' },
-        { model: Sector, as: 'sectors' }
+        { model: GrupoHospitalar, as: 'grupoHospitalar' },
+        { model: Setor, as: 'setores' }
       ],
     });
     if (hospital) {
       res.status(200).json(hospital);
     } else {
-      res.status(404).json({ message: 'Hospital não encontrado.' });
+      res.status(404).json({ mensagem: 'Hospital não encontrado' });
     }
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao obter o hospital.', error });
+  } catch (erro) {
+    res.status(500).json({
+      mensagem: 'Erro ao obter o hospital',
+      erro: erro.message
+    });
   }
 };
 
 // Criar um novo hospital
-exports.createHospital = async (req, res) => {
-  const { name, groupId, createUser } = req.body;
+exports.criarHospital = async (req, res) => {
+  const {
+    nome,
+    grupoId,
+    subgrupoId,
+    uf,
+    municipio,
+    codigoCnes,
+    codigoAcessoPlataforma,
+    tipoHospital,
+    sigla,
+    cnpj,
+    endereco,
+    usuarioCriacao
+  } = req.body;
+
   try {
-    const newHospital = await Hospital.create({ name, groupId, createUser });
-    res.status(201).json(newHospital);
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao criar o hospital.', error });
+    const novoHospital = await Hospital.create({
+      nome,
+      grupoId,
+      subgrupoId,
+      uf,
+      municipio,
+      codigoCnes,
+      codigoAcessoPlataforma,
+      tipoHospital,
+      sigla,
+      cnpj,
+      endereco,
+      usuarioCriacao
+    });
+    res.status(201).json(novoHospital);
+  } catch (erro) {
+    res.status(500).json({
+      mensagem: 'Erro ao criar o hospital',
+      erro: erro.message
+    });
   }
 };
 
 // Atualizar um hospital existente
-exports.updateHospital = async (req, res) => {
+exports.atualizarHospital = async (req, res) => {
   const { id } = req.params;
-  const { name, groupId, updateUser } = req.body;
+  const {
+    nome,
+    grupoId,
+    subgrupoId,
+    uf,
+    municipio,
+    codigoCnes,
+    codigoAcessoPlataforma,
+    tipoHospital,
+    sigla,
+    cnpj,
+    endereco,
+    usuarioAtualizacao
+  } = req.body;
+
   try {
     const hospital = await Hospital.findByPk(id);
     if (hospital) {
-      await hospital.update({ name, groupId, updateUser });
+      await hospital.update({
+        nome,
+        grupoId,
+        subgrupoId,
+        uf,
+        municipio,
+        codigoCnes,
+        codigoAcessoPlataforma,
+        tipoHospital,
+        sigla,
+        cnpj,
+        endereco,
+        usuarioAtualizacao
+      });
       res.status(200).json(hospital);
     } else {
-      res.status(404).json({ message: 'Hospital não encontrado.' });
+      res.status(404).json({ mensagem: 'Hospital não encontrado' });
     }
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao atualizar o hospital.', error });
+  } catch (erro) {
+    res.status(500).json({
+      mensagem: 'Erro ao atualizar o hospital',
+      erro: erro.message
+    });
   }
 };
 
 // Deletar um hospital
-exports.deleteHospital = async (req, res) => {
+exports.deletarHospital = async (req, res) => {
   const { id } = req.params;
   try {
     const hospital = await Hospital.findByPk(id);
     if (hospital) {
       await hospital.destroy();
-      res.status(200).json({ message: 'Hospital deletado com sucesso.' });
+      res.status(200).json({ mensagem: 'Hospital deletado com sucesso' });
     } else {
-      res.status(404).json({ message: 'Hospital não encontrado.' });
+      res.status(404).json({ mensagem: 'Hospital não encontrado' });
     }
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao deletar o hospital.', error });
+  } catch (erro) {
+    res.status(500).json({
+      mensagem: 'Erro ao deletar o hospital',
+      erro: erro.message
+    });
   }
 };
+
+module.exports = exports;

@@ -1,17 +1,19 @@
 const { Internment, Patient, Sector } = require('../models');
 
-exports.getAllInternments = async (req, res) => {
+exports.obterTodasInternacoes = async (req, res) => {
     try {
-        const internments = await Internment.findAll({
+        const internacoes = await Internment.findAll({
             include: [
                 { model: Patient, as: 'patient' },
                 { model: Sector, as: 'dischargeSector' }
             ]
         });
-        res.status(200).json(internments);
-    } catch (error) {
-        console.error('Erro ao obter internações:', error);
-        res.status(500).json({ message: 'Erro ao obter internações.', error: error.message });
+        res.status(200).json(internacoes);
+    } catch (erro) {
+        res.status(500).json({
+            mensagem: 'Erro ao buscar internações',
+            erro: erro.message
+        });
     }
 };
 

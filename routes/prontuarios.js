@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const medicalRecordController = require('../controllers/MedicalRecordController');
+const controladorProntuario = require('../controllers/ProntuarioController');
 
 /**
  * @swagger
@@ -63,10 +63,39 @@ const medicalRecordController = require('../controllers/MedicalRecordController'
 
 /**
  * @swagger
- * /api/medical-records:
+ * /api/prontuarios:
+ *   get:
+ *     summary: Lista todos os prontuários
+ *     tags: [Prontuários]
+ *     responses:
+ *       200:
+ *         description: Lista de prontuários obtida com sucesso
+ *       500:
+ *         $ref: '#/components/responses/ErroServidor'
+ */
+router.get('/', controladorProntuario.obterTodosProntuarios);
+
+/**
+ * @swagger
+ * /api/prontuarios/{id}:
+ *   get:
+ *     summary: Buscar prontuário por ID
+ *     tags: [Prontuários]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ */
+router.get('/:id', controladorProntuario.obterProntuarioPorId);
+
+/**
+ * @swagger
+ * /api/prontuarios:
  *   post:
  *     summary: Cria novo prontuário com múltiplas falhas
- *     tags: [Medical Records]
+ *     tags: [Prontuários]
  *     requestBody:
  *       required: true
  *       content:
@@ -116,29 +145,14 @@ const medicalRecordController = require('../controllers/MedicalRecordController'
  *       500:
  *         description: Erro interno do servidor
  */
-router.post('/', medicalRecordController.createMedicalRecordWithFailures);
+router.post('/', controladorProntuario.criarProntuario);
 
 /**
  * @swagger
- * /api/medical-records/{id}:
- *   get:
- *     summary: Buscar prontuário por ID
- *     tags: [Medical Records]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- */
-router.get('/:id', medicalRecordController.getById);
-
-/**
- * @swagger
- * /api/medical-records/{id}:
+ * /api/prontuarios/{id}:
  *   put:
  *     summary: Atualizar prontuário
- *     tags: [Medical Records]
+ *     tags: [Prontuários]
  *     parameters:
  *       - in: path
  *         name: id
@@ -146,14 +160,29 @@ router.get('/:id', medicalRecordController.getById);
  *         schema:
  *           type: integer
  */
-router.put('/:id', medicalRecordController.update);
+router.put('/:id', controladorProntuario.atualizarProntuario);
 
 /**
  * @swagger
- * /api/medical-records/{id}/failures:
+ * /api/prontuarios/{id}:
+ *   delete:
+ *     summary: Remover prontuário
+ *     tags: [Prontuários]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ */
+router.delete('/:id', controladorProntuario.deletarProntuario);
+
+/**
+ * @swagger
+ * /api/prontuarios/{id}/failures:
  *   post:
  *     summary: Adicionar novas falhas ao prontuário
- *     tags: [Medical Records]
+ *     tags: [Prontuários]
  *     parameters:
  *       - in: path
  *         name: id
@@ -161,14 +190,14 @@ router.put('/:id', medicalRecordController.update);
  *         schema:
  *           type: integer
  */
-router.post('/:id/failures', medicalRecordController.addFailures);
+router.post('/:id/failures', controladorProntuario.adicionarFalhas);
 
 /**
  * @swagger
- * /api/medical-records/{id}/failures/{failureId}:
+ * /api/prontuarios/{id}/failures/{failureId}:
  *   delete:
  *     summary: Remover falha do prontuário
- *     tags: [Medical Records]
+ *     tags: [Prontuários]
  *     parameters:
  *       - in: path
  *         name: id
@@ -181,6 +210,6 @@ router.post('/:id/failures', medicalRecordController.addFailures);
  *         schema:
  *           type: integer
  */
-router.delete('/:id/failures/:failureId', medicalRecordController.removeFailure);
+router.delete('/:id/failures/:failureId', controladorProntuario.removerFalha);
 
 module.exports = router; 
